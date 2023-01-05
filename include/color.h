@@ -1,0 +1,16 @@
+#define Black 0x0
+#define Blue 0x1
+#define Green 0x2
+#define Cyan  0x3
+#define Red 0x4
+#define Magenta 0x5
+#define Brown 0x6
+#define Light_Gray 0x7
+#define dark_Gray 0x8
+#define Light_Blue 0x9
+#define Light_Green 0xa
+#define Light_Cyan 0xb
+#define Light_Red 0xc
+#define Light_magenta 0xd
+#define Yellow 0xe
+#define White 0xf

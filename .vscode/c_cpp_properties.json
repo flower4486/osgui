@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/include"
+            ],
+            "defines": [],
+            "cStandard": "gnu99",
+            "compilerArgs": ["-m32"]
+        }
+    ],
+    "version": 4
+}
