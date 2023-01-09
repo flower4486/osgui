@@ -39,15 +39,5 @@ void sys_print_E()
  */
 void sys_print_F()
 {
-	int i, j;
-	
-	disp_str("F( ");
-	
-	i = 100;
-	while(--i){
-		j = 1000;
-		while(--j){}
-	}
-	
-	disp_str(") ");
+gui();
 }

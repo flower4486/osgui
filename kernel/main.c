@@ -32,9 +32,6 @@ int kernel_main()
 {
 	int error;
 	gui_mode=0;
-	gui();
-	
-	while (1);
 	disp_pos = 0;
 	for (int i = 0; i < 25; i++) {
 		for (int j = 0; j < 80; j++) {

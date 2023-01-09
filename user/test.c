@@ -9,10 +9,7 @@
 
 
 int main(){
-    while (1)
-    {
-        printf("hello gui");
-    }
+print_F();
     
 
     return 0;
