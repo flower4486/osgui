@@ -9,6 +9,7 @@
 #include "proto.h"
 #include "keyboard.h"
 #include "x86.h"
+#include "color.h"
 
 int current_console; //当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
@@ -111,7 +112,9 @@ void task_tty()
 		{
 			do
 			{
-				tty_mouse(p_tty);     /* tty判断鼠标操作 */
+
+				tty_mouse(p_tty);
+				     /* tty判断鼠标操作 */
 				tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
 				tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
 

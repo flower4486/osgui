@@ -12,60 +12,146 @@
 #include "stdio.h"
 #include "vga.h"
 #include "color.h"
-
-#define memstart 0xA0000
+#include "font.h"
+#include "window.h"
+#define memstart K_PHY2LIN(0xA0000)
 #define memsize 64000
 #define width 320
 #define cursor_side 6
 #define height 200
 void gui();
-void putPoint(int x,int y,int Color);//put a point
-void drawline(int row,int start,int end,int color);//draw a line
-void rectangle(int x1, int y1, int x2, int y2, int Color);  /* 画一矩形*/
-void drawmouse(int x, int y, int back_color);
-void gui(){
+void putPoint(int x, int y, int Color);                    // put a point
+void drawline(int row, int start, int end, int color);     // draw a line
+void rectangle(int x1, int y1, int x2, int y2, int Color); /* 画一矩形*/
+void cmd_window_write_string(int x, int y, char *s, u32 color, u32 backcolor);
+static void cmd_window_write_char(int x, int y, int val, u32 color, u32 backColour);
+static void cmd_window_draw_mouse(int x, int y, u32 color, u32 backColour);
+int draw_rect(u8 * buffer, int color, int x, int y, int w, int h);
+void gui()
+{
+ //  open gui mode
    vga_write_regs(vga_320x200x256);
+   gui_mode=1;
+   //int p;
+   u8* p=(u8 *)memstart;
+   //Paint the screen black
+   memset(p,Black,memsize);
+   // for (int i =0; i < memsize; i++)
+   // {
+   //    *(p++)=Blue;
+     
+   // }
+   //memset((u8*)memstart,Red,320*200);
+   //drawline(20,20,200,Red);
+   //u8* buffer=sys_kmalloc(320*200);
+  // draw_rect(buffer,Black,100,50,100,100);
+   
+  // memcpy((u8 *)memstart, buffer, 320*200);
+   // rectangle(100,20,300,100,Red);
+   // cmd_window_write_char(100,100,(int)'d',Red,Black);
+   // cmd_window_write_string(100,100,"hello123",Red,Blue);
+   //cmd_window_draw_mouse(100, 100, Blue, Black);
+}
+
+void putPoint(int x, int y, int Color) /* 画点函数 */
+{
    u8 *p;
 
-   p=(u8 *)memstart;
-   for(int i=0;i<memsize;i++) *p++=Black;
-   *(p+memsize/2)=0x26;
- 
-    rectangle(100,20,200,100,Red);
-    drawmouse(0,0,Blue);
- }
-
- void putPoint(int x, int y, int Color)   /* 画点函数 */
-{
-   char  *p;
-
-   p = (char*) (0xa0000);
-   *(x+y*320+p) = Color;
+   p = (u8*)memstart;
+   *(x + y * 320 + p) = Color;
 }
 
-void drawline(int row,int start,int end,int color)
+void drawline(int row, int start, int end, int color)
 // draw a line form x to y
 {
-    char *lstart,*lend;
-    lstart = (char *)(0xa0000+row*320+start);
-    //lend = (char *)(0xa0000+row*320+end);
+   char *lstart, *lend;
+   lstart = (char *)(memstart + row * 320 + start);
+   // lend = (char *)(memstart+row*320+end);
 
-    memset((void *)lstart,color,end-start);
+   memset((void *)lstart, color, end - start);
 }
-void rectangle(int x1, int y1, int x2, int y2, int Color)  /* 画一矩形*/
+void rectangle(int x1, int y1, int x2, int y2, int Color) /* 画一矩形*/
 
 {
    for (int i = x1; i < x2; i++)
    {
-     for (int j = y1; j < y2; j++)
-     {
-        putPoint(i,j,Color);
-     }
-     
+      for (int j = y1; j < y2; j++)
+      {
+         putPoint(i, j, Color);
+      }
    }
-   
 }
 
+static void cmd_window_write_char(int x, int y, int val, u32 color, u32 backColour)
+{
+   if (val > 128)
+   {
+      val = 4;
+   }
+   u8 *c = number_font[val];
+
+   for (int i = 0; i < VGA_CHAR_HEIGHT; ++i)
+   {
+      for (int j = 0; j < VGA_CHAR_WIDTH; ++j)
+      {
+
+         if (c[i] & (1 << (8 - j)))
+         {
+            putPoint(x + j, y + i, color);
+         }
+         else
+         {
+            putPoint(x + j, y + i, backColour);
+         }
+      }
+   }
+   return;
+}
+
+ void cmd_window_write_string(int x, int y, char *s, u32 color, u32 backcolor)
+{
+   while (*s != '\0')
+   {
+      cmd_window_write_char(x, y, (int)(*(s++)), color, backcolor);
+      x += VGA_CHAR_WIDTH;
+   }
+}
+
+static void cmd_window_draw_mouse(int x, int y, u32 color, u32 backColour)
+{
+
+   u8 *c = term_cursor_font[0];
+
+   for (int i = 0; i < VGA_CHAR_HEIGHT; ++i)
+   {
+      for (int j = 0; j < VGA_CHAR_WIDTH; ++j)
+      {
+
+         if (c[i] & (1 << (8 - j)))
+         {
+            putPoint(x + j, y + i, color);
+         }
+         else
+         {
+            putPoint(x + j, y + i, backColour);
+         }
+      }
+   }
+   return;
+}
+
+int draw_rect(u8 * buffer, int color, int x, int y, int w, int h)
+{
+   int wd_in_bytes;
+	int off, i;
+		wd_in_bytes = 320;
+		for(i=0;i < h;i++)
+		{
+			off = wd_in_bytes * (y + i) + x;
+			memset((buffer + off), color, w);
+		}
+	return 0;
+}
 
 /* 
 形如下图
