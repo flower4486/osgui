@@ -22,8 +22,10 @@ void gui();
 void putPoint(int x,int y,int Color);//put a point
 void drawline(int row,int start,int end,int color);//draw a line
 void rectangle(int x1, int y1, int x2, int y2, int Color);  /* 画一矩形*/
-void drawmouse(int x, int y, int back_color);
-void gui(){
+// void drawmouse(int x, int y, int back_color);
+void drawmouse(int x, int y);
+void movemouse(TTY *tty);
+void gui(TTY *tty){
    vga_write_regs(vga_320x200x256);
    u8 *p;
 
@@ -32,7 +34,11 @@ void gui(){
    *(p+memsize/2)=0x26;
  
     rectangle(100,20,200,100,Red);
-    drawmouse(0,0,Blue);
+    // drawmouse(0,0,Blue);
+	drawmouse(0,0);
+	// while(1){
+	// 	movemouse(tty);
+	// }
  }
 
  void putPoint(int x, int y, int Color)   /* 画点函数 */
@@ -85,8 +91,10 @@ void rectangle(int x1, int y1, int x2, int y2, int Color)  /* 画一矩形*/
 		"*..........*OOO*",
 		"............*OO*",
 		".............***"
+		下面是个粗浅的鼠标绘制
 */
-void drawmouse(int x,int y, int back_color){ /* 画鼠标*/
+// void drawmouse(int x,int y, int back_color){ /* 画鼠标*/
+void drawmouse(int x,int y){ /* 画鼠标*/
    static char cursor[12][12] = {
 		"************",
 		"*OOOOOOOOOO*",
@@ -111,10 +119,23 @@ void drawmouse(int x,int y, int back_color){ /* 画鼠标*/
 				// mouse[y * 16 + x] = COL8_FFFFFF;
             putPoint(i, j, White);
 			}
-			if (cursor[j-y][i-x] == '.') {
-				// mouse[y * 16 + x] = back_color;
-            putPoint(i,j,back_color);
-			}
+			// if (cursor[j-y][i-x] == '.') {
+			// 	// mouse[y * 16 + x] = back_color;
+            // putPoint(i,j,back_color);
+			// }
 		}
    }
 }
+
+
+/*
+	鼠标图标的移动逻辑，要与mouse_handler连接起来
+*/
+// void movemouse(TTY *tty){
+
+// 	int dir_x = tty->mouse_X;
+// 	int dir_y = tty->mouse_Y;
+// 	drawmouse(dir_x,dir_y,Blue);
+
+	
+// }

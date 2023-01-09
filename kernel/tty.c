@@ -142,7 +142,6 @@ static void tty_mouse(TTY *tty)
 		int real_line = tty->console->orig / SCR_WIDTH;
 		if (tty->mouse_left_button)
 		{
-
 			if (tty->mouse_Y > MOUSE_UPDOWN_BOUND)
 			{ //按住鼠标左键向上滚动
 				if (tty->console->current_line < 43)
