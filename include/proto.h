@@ -64,10 +64,11 @@ void spurious_irq(int irq);
 
 /* clock.c */
 void clock_handler(int irq);
-
 /*gui.c*/
 void gui();
 void init_gui();
+void cmd_window_write_string(int x, int y, char *s, u32 color, u32 backcolor);
+void rectangle(int x1, int y1, int x2, int y2, int Color); /* 画一矩形*/
 
 /***************************************************************
 * 以下是系统调用相关函数的声明	

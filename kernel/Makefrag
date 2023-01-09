@@ -5,6 +5,7 @@ KERN_ENTRY_ADDR	:= 0xC0030400
 KERN_SRCFILES :=kernel/kernel.asm	\
 		kernel/gui.c\
 		kernel/vga.c\
+		kernel/window.c\
 		kernel/hd.c	\
 		kernel/fat32.c	\
 		kernel/tty.c	\
