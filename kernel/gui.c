@@ -30,7 +30,7 @@ int draw_rect(u8 * buffer, int color, int x, int y, int w, int h);
 void gui()
 {
  //  open gui mode
-   vga_write_regs(vga_320x200x256);
+   vga_write_regs(vga_640x480x16);
    gui_mode=1;
    //int p;
    u8* p=(u8 *)memstart;
