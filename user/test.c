@@ -9,7 +9,10 @@
 
 
 int main(){
-print_F();
+  //  while (1)
+    {
+        print_F();
+    }
     
 
     return 0;

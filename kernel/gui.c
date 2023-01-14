@@ -14,56 +14,35 @@
 #include "color.h"
 #include "font.h"
 #include "window.h"
-#define memstart K_PHY2LIN(0xA0000)
-#define memsize 64000
-#define width 320
-#define cursor_side 6
-#define height 200
-void gui();
-<<<<<<< HEAD
-void putPoint(int x,int y,int Color);//put a point
-void drawline(int row,int start,int end,int color);//draw a line
-void rectangle(int x1, int y1, int x2, int y2, int Color);  /* 画一矩形*/
-// void drawmouse(int x, int y, int back_color);
-void drawmouse(int x, int y);
-void movemouse(TTY *tty);
-void gui(TTY *tty){
-   vga_write_regs(vga_320x200x256);
-   u8 *p;
+#include "sheet.h"
+#include "gui.h"
 
-   p=(u8 *)memstart;
-   for(int i=0;i<memsize;i++) *p++=Black;
-   *(p+memsize/2)=0x26;
- 
-    rectangle(100,20,200,100,Red);
-    // drawmouse(0,0,Blue);
-	drawmouse(0,0);
-	// while(1){
-	// 	movemouse(tty);
-	// }
- }
-=======
-void putPoint(int x, int y, int Color);                    // put a point
-void drawline(int row, int start, int end, int color);     // draw a line
-void rectangle(int x1, int y1, int x2, int y2, int Color); /* 画一矩形*/
-void cmd_window_write_string(int x, int y, char *s, u32 color, u32 backcolor);
-static void cmd_window_write_char(int x, int y, int val, u32 color, u32 backColour);
-static void cmd_window_draw_mouse(int x, int y, u32 color, u32 backColour);
-int draw_rect(u8 * buffer, int color, int x, int y, int w, int h);
 void gui()
 {
- //  open gui mode
    vga_write_regs(vga_320x200x256);
+ //  open gui mode
+   //vga_write_regs(vga_80x25_text);
    gui_mode=1;
    //int p;
    u8* p=(u8 *)memstart;
    //Paint the screen black
-   memset(p,Black,memsize);
+   //memset(p,Black,memsize);
+  //sheet_test();
+   disable_int();
+     
+   sheets=sheets_init(p,320,200);
+   set_bkcolor(sheets,Black);
+   sheet_refresh_rect(sheets);
+   
+   // win_test();
+   sheet_test();
+   enable_int();
    // for (int i =0; i < memsize; i++)
    // {
-   //    *(p++)=Blue;
-     
+   //    *(p++)=0x1;
    // }
+
+   //cmd_window_write_string(100,100,"hello,os",Red,Blue);
    //memset((u8*)memstart,Red,320*200);
    //drawline(20,20,200,Red);
    //u8* buffer=sys_kmalloc(320*200);
@@ -75,7 +54,6 @@ void gui()
    // cmd_window_write_string(100,100,"hello123",Red,Blue);
    //cmd_window_draw_mouse(100, 100, Blue, Black);
 }
->>>>>>> 9589923b6d22ee5530932a5333eecc33bf909d28
 
 void putPoint(int x, int y, int Color) /* 画点函数 */
 {
@@ -106,7 +84,7 @@ void rectangle(int x1, int y1, int x2, int y2, int Color) /* 画一矩形*/
    }
 }
 
-static void cmd_window_write_char(int x, int y, int val, u32 color, u32 backColour)
+ void vga_write_char(int x, int y, int val, u32 color, u32 backColour)
 {
    if (val > 128)
    {
@@ -131,17 +109,44 @@ static void cmd_window_write_char(int x, int y, int val, u32 color, u32 backColo
    }
    return;
 }
+void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u8 color,u8 bkcolor)
+{
+    if (achar > 128)
+   {
+      achar = 4;
+   }
+   u8 *c = number_font[achar];
 
- void cmd_window_write_string(int x, int y, char *s, u32 color, u32 backcolor)
+   for (int i = 0; i < VGA_CHAR_HEIGHT; ++i)
+   {
+      for (int j = 0; j < VGA_CHAR_WIDTH; ++j)
+      {
+
+         if (c[i] & (1 << (8 - j)))
+         {
+           *(mywin->sheet->buf+j+x+mywin->sheet->width*(y+i))=color;
+         }
+         else
+         {
+            *(mywin->sheet->buf+j+x+mywin->sheet->width*(y+i))=bkcolor;
+         }
+      }
+   }
+   return;
+}
+
+
+ void vga_write_string(int x, int y, char *s, u32 color, u32 backcolor)
 {
    while (*s != '\0')
    {
-      cmd_window_write_char(x, y, (int)(*(s++)), color, backcolor);
+      vga_write_char(x, y, (int)(*(s++)), color, backcolor);
       x += VGA_CHAR_WIDTH;
    }
 }
 
-static void cmd_window_draw_mouse(int x, int y, u32 color, u32 backColour)
+
+ void vga_draw_mouse(int x, int y, u32 color, u32 backColour)
 {
 
    u8 *c = term_cursor_font[0];
@@ -176,70 +181,3 @@ int draw_rect(u8 * buffer, int color, int x, int y, int w, int h)
 		}
 	return 0;
 }
-
-/* 
-形如下图
-		"**************..",
-		"*OOOOOOOOOOO*...",
-		"*OOOOOOOOOO*....",
-		"*OOOOOOOOO*.....",
-		"*OOOOOOOO*......",
-		"*OOOOOOO*.......",
-		"*OOOOOOO*.......",
-		"*OOOOOOOO*......",
-		"*OOOO**OOO*.....",
-		"*OOO*..*OOO*....",
-		"*OO*....*OOO*...",
-		"*O*......*OOO*..",
-		"**........*OOO*.",
-		"*..........*OOO*",
-		"............*OO*",
-		".............***"
-		下面是个粗浅的鼠标绘制
-*/
-// void drawmouse(int x,int y, int back_color){ /* 画鼠标*/
-void drawmouse(int x,int y){ /* 画鼠标*/
-   static char cursor[12][12] = {
-		"************",
-		"*OOOOOOOOOO*",
-		"*OOOOOOOOO*.",
-		"*OOOOOOOO*..",
-		"*OOOOOOOO*..",
-		"*OOOOOOO*...",
-		"*OOOOOOO*...",
-		"*OOOOOOOO*..",
-		"*OOOO**OOO*.",
-		"*OOO*..*OOO*",
-		"*OO*....*OO*",
-		"*O*......***"
-	};
-   for (int j  = y; j < y+12; j++) {
-		for (int i = x; i < x+12; i++) {
-			if (cursor[j-y][i-x] == '*') {
-				// mouse[y * 16 + x] = COL8_000000;
-            putPoint(i, j, Black);
-			}
-			if (cursor[j-y][i-x] == 'O') {
-				// mouse[y * 16 + x] = COL8_FFFFFF;
-            putPoint(i, j, White);
-			}
-			// if (cursor[j-y][i-x] == '.') {
-			// 	// mouse[y * 16 + x] = back_color;
-            // putPoint(i,j,back_color);
-			// }
-		}
-   }
-}
-
-
-/*
-	鼠标图标的移动逻辑，要与mouse_handler连接起来
-*/
-// void movemouse(TTY *tty){
-
-// 	int dir_x = tty->mouse_X;
-// 	int dir_y = tty->mouse_Y;
-// 	drawmouse(dir_x,dir_y,Blue);
-
-	
-// }

@@ -17,6 +17,7 @@ extern	disp_pos
 global	disp_str
 global	disp_color_str
 global  write_char	; added by mingxuan 2019-5-19
+global write_u8
 
 ; ========================================================================
 ;                  void disp_str(char * info);
@@ -119,6 +120,20 @@ write_char:
 	mov eax,esi
 	mov	ah, 0Fh
 	mov	[gs:edi], ax
+	pop eax
+	pop ebp
+	ret
+write_u8:
+	push 	ebp
+	mov ebp,esp
+	
+	mov esi,[ebp+8] 
+	mov edi,[disp_pos]
+	
+	push eax
+	mov eax,esi
+
+	mov	[gs:edi], al
 	pop eax
 	pop ebp
 	ret

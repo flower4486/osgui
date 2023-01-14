@@ -14,15 +14,15 @@
 
 
 
-u8 * lfb_vid_memory = NULL;
+u32 * lfb_vid_memory =(u32 *)0xA0000;
 
 u32 vga_current_mode = VGA_MODE_80X25_TEXT;
 
 u8 * vga_text_content_backup = NULL;
 
-u16 lfb_resolution_x = 0;
-u16 lfb_resolution_y = 0;
-u16 lfb_resolution_b = 0;
+u16 lfb_resolution_x = 320;
+u16 lfb_resolution_y = 200;
+u16 lfb_resolution_b = 16;
 
 u8 vga_80x25_text[] =
 {
@@ -496,7 +496,7 @@ assume: chain-4 addressing already off */
 void vga_write_regs(u8 *regs)
 {
 	u32 i;
-
+	disable_int();
 /* write MISCELLANEOUS reg */
 	outb(VGA_MISC_WRITE, *regs);
 	regs++;
@@ -540,6 +540,7 @@ void vga_write_regs(u8 *regs)
 /* lock 16-color palette and unblank display */
 	(void)inb(VGA_INSTAT_READ);
 	outb(VGA_AC_INDEX, 0x20);
+	enable_int();
 }
 
 

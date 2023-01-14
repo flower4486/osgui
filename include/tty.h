@@ -55,5 +55,5 @@ void select_console(int nr_console);
 void init_screen(TTY* tty);
 void out_char(CONSOLE* con, char ch);
 int is_current_console(CONSOLE* con);
-void drawmouse(int x,int y);
+
 #endif /* _ORANGES_TTY_H_ */

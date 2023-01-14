@@ -13,6 +13,7 @@
 #include "fs.h"
 #include "vfs.h"
 #include "string.h"
+#include "color.h"
 
 /**
  * @struct posix_tar_header
@@ -126,12 +127,10 @@ void initial()
 	do_vclose(stdin);
 	do_vclose(stdout);
 	do_vclose(stderr);
-	//while (1)
-	{
-		/* code */
-	}
 	
-	exec("orange/shell_0.bin");
-
+	//cmd_window_write_string(20,100,"hello",Blue,Red);
+	
+	//exec("orange/shell_0.bin");
+	exec("orange/test.bin");
 	while(1);
 }

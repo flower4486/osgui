@@ -5,8 +5,13 @@
 #include "protect.h"
 #include "tty.h"
 #include "proc.h"
-
+#include "global.h"
 #include "proto.h"
+#include "sheet.h"
+#include "color.h"
+#include "vga.h"
+#include "gui.h"
+
 //vga.c
 extern u32 * lfb_vid_memory;
 extern u16 lfb_resolution_x;
@@ -22,35 +27,31 @@ MY_WINDOW * mywin_list_header = NULL;
 MY_WINDOW * mywin_list_end = NULL;
 MY_WINDOW * mywin_list_kbd_input = NULL;
 
-int my_mouse_x = 0;
-int my_mouse_y = 0;
-int my_mouse_w = 0;
-int my_mouse_h = 0;
-u8 my_mouse_left_press = FALSE;
-int my_mouse_left_press_x = 0;
-int my_mouse_left_press_y = 0;
-MY_RECT my_drag_rect = {0};
-MY_WINDOW * my_drag_win = NULL;
-u8 my_mouse_isInit = FALSE;
 
-static int draw_my_window(MY_WINDOW * my_window, 
-		u8 * need_update_mouse,MY_RECT * mouse_update_rect);
-int create_my_window(MY_WINDOW * my_window);
+// void win_test()
+// {
+// 	struct sheets* s=sheets;
+// 	MY_WINDOW* mywin=alloc_window();
+// 	init_window(mywin);
+// 	draw_win_rect(mywin);
 
-int create_my_window(MY_WINDOW * my_window)
+// 	MY_WINDOW* mywin2=alloc_window();
+// 	// init_window(mywin2);
+// 	// draw_win_rect(mywin2);
+// 	sheet_slide(sheets,mywin2->sheet,100,100);
+
+// 	// win_cmd_put_string(mywin2,"hello,my gui");
+// 	// vga_draw_mouse(0,0,Red,Blue);
+// 	drawmouse(0,0);
+// }
+
+MY_WINDOW* alloc_window()
 {
-	MY_WINDOW * mywin = (MY_WINDOW *)sys_kmalloc(sizeof(MY_WINDOW));
-	memset((u8 *)mywin, 0, sizeof(MY_WINDOW));
-	int pix_byte = lfb_resolution_b / 8;
-	mywin->x = my_window->x;
-	mywin->y = my_window->y;
-	mywin->width = my_window->width;
-	mywin->height = my_window->height;
-	mywin->bitmap = (u32 *)sys_kmalloc(my_window->width * my_window->height * pix_byte);
-	//mywin->mywin_callback = my_window->mywin_callback;
-	mywin->task = my_window->task;
-	mywin->kbd_task = my_window->task;
-	//((ZLOX_TASK *)mywin->task)->mywin = mywin;
+	MY_WINDOW* mywin=(MY_WINDOW*)sys_malloc(sizeof(MY_WINDOW));
+	memset((u8*)mywin,0,sizeof(MY_WINDOW));
+
+	mywin->sheet=sheet_alloc(sheets);
+ 
 	if(mywin_list_header == NULL)
 	{
 		mywin_list_header = mywin;
@@ -61,128 +62,149 @@ int create_my_window(MY_WINDOW * my_window)
 		MY_WINDOW * tmpwin = mywin_list_header;
 		for(;;)
 		{
-			if(tmpwin->next == NULL)
+			if(tmpwin->nxt == NULL)
 			{
-				tmpwin->next = mywin;
-				mywin->prev = tmpwin;
+				tmpwin->nxt = mywin;
+				mywin->pre = tmpwin;
 				break;
 			}
 			else
 			{
-				tmpwin = tmpwin->next;
+				tmpwin = tmpwin->nxt;
 			}
 		}
 		mywin_list_end = mywin;
 	}
-	//ZLOX_TASK_MSG msg = {0};
-	//msg.type = ZLOX_MT_CREATE_MY_WINDOW;
-	//zlox_send_tskmsg((ZLOX_TASK *)mywin->task,&msg);
-	return (int)mywin;
+
+	return mywin;
 }
 
-static int draw_my_window(MY_WINDOW * my_window, 
-		u8 * need_update_mouse,MY_RECT * mouse_update_rect)
+void init_window(MY_WINDOW* mywin)
 {
-	MY_WINDOW * mywin = my_window;
-	u32 * vid_mem = (u32 *)lfb_vid_memory;
-	int x, y , j, w, h, src_x, src_y;
-	int pix_byte = lfb_resolution_b / 8;
-	if(mywin->need_update)
-	{
-		x = mywin->x + mywin->update_rect.x;
-		y = mywin->y + mywin->update_rect.y;
-		src_x = mywin->update_rect.x;
-		src_y = mywin->update_rect.y;
-		w = mywin->update_rect.width;
-		h = mywin->update_rect.height;
-	}
-	else
-	{
-		x = mywin->x;
-		y = mywin->y;
-		src_x = 0;
-		src_y = 0;
-		w = mywin->width;
-		h = mywin->height;
-	}
-	MY_RECT tmp_rect;
-	MY_RECT lfb_tmp_rect;
-	MY_RECT intersect_rect;
-	tmp_rect.x = x;
-	tmp_rect.y = y;
-	tmp_rect.width = w;
-	tmp_rect.height = h;
-	lfb_tmp_rect.x = 0;
-	lfb_tmp_rect.y = 0;
-	lfb_tmp_rect.width = lfb_resolution_x;
-	lfb_tmp_rect.height = lfb_resolution_y;
-	if(detect_intersect_rect(&tmp_rect, &lfb_tmp_rect, &intersect_rect) == FALSE)
-	{
-		if(need_update_mouse != NULL)
-			(*need_update_mouse) = FALSE;
-		return -1;
-	}
-	x = intersect_rect.x;
-	y = intersect_rect.y;
-	src_x = intersect_rect.x - mywin->x;
-	src_y = intersect_rect.y - mywin->y;
-	w= intersect_rect.width;
-	h = intersect_rect.height;
-	for(j = 0; j < h ; y++, src_y++, j++)
-	{
-		memcpy((u8 *)&vid_mem[x + y * lfb_resolution_x], 
-				(u8 *)&mywin->bitmap[src_x + src_y * mywin->width], 
-				w * pix_byte);
-	}
-	if(need_update_mouse != NULL && mouse_update_rect != NULL)
-	{
-		tmp_rect.x = my_mouse_x;
-		tmp_rect.y = my_mouse_y;
-		tmp_rect.width = my_mouse_w;
-		tmp_rect.height = my_mouse_h;
-		(*need_update_mouse) = detect_intersect_rect(&tmp_rect, &intersect_rect, mouse_update_rect);
-	}
-	return 0;
+	sheet_setsheet(mywin->sheet,200,100,20,20);
+	u8* winbuf=(u8*)sys_malloc(mywin->sheet->width*mywin->sheet->height);
+
+	sheet_setbuf(mywin->sheet,winbuf);
+	sheet_set_layer(sheets,mywin->sheet,100);
+
+	mywin->title_rect.height=VGA_CHAR_HEIGHT;
+	mywin->title_rect.width=0.9*mywin->sheet->width;
+	mywin->title_rect.rx=0;
+	mywin->title_rect.ry=0;
+	mywin->title_rect.color=Yellow;
+
+	mywin->close_btn_rect.height=VGA_CHAR_HEIGHT;
+	mywin->close_btn_rect.width=0.1*mywin->sheet->width;
+	mywin->close_btn_rect.rx=0.9*mywin->sheet->width;
+	mywin->close_btn_rect.ry=0;
+	mywin->close_btn_rect.color=Red;
+
+	mywin->cmd_rect.height=mywin->sheet->height-12;
+	mywin->cmd_rect.width=mywin->sheet->width;
+	mywin->cmd_rect.rx=0;
+	mywin->cmd_rect.ry=12;
+	mywin->cmd_rect.color=Blue;
+
+	mywin->cmd_font_color=White;
+
+	mywin->cmd_cursor_x=0;
+	mywin->cmd_cursor_y=0;
+	mywin->cmd_font_height=VGA_CHAR_HEIGHT;
+	mywin->cmd_font_width=VGA_CHAR_WIDTH;
+	return;
 }
 
-static u8 detect_intersect_rect(MY_RECT * rect1, MY_RECT * rect2, MY_RECT * d_rect)
+void draw_win_rect(MY_WINDOW* mywin)
 {
-	int r1_x = rect1->x + rect1->width - 1;
-	int r1_y = rect1->y + rect1->height - 1;
-	int r2_x = rect2->x + rect2->width - 1;
-	int r2_y = rect2->y + rect2->height - 1;
-	int d_x = 0;
-	int d_y = 0;
+	struct sheets* s=sheets;
+	u8* buf=mywin->sheet->buf;
+	int i,j;
+	for ( i = 0; i < mywin->title_rect.height; i++)
+	{
+		for (j = 0; j < mywin->title_rect.width; j++)
+		{
+			buf[(i+mywin->title_rect.ry)*mywin->sheet->width+j+mywin->title_rect.rx]=mywin->title_rect.color;
+		}
+	}
 
-	if(rect1->x >= rect2->x && rect1->x <= r2_x)
-		d_rect->x = rect1->x;
-	else if(rect2->x >= rect1->x && rect2->x <= r1_x)
-		d_rect->x = rect2->x;
-	else
-		return FALSE;
 
-	if(rect1->y >= rect2->y && rect1->y <= r2_y)
-		d_rect->y = rect1->y;
-	else if(rect2->y >= rect1->y && rect2->y <= r1_y)
-		d_rect->y = rect2->y;
-	else
-		return FALSE;
+	for ( i = 0; i < mywin->cmd_rect.height; i++)
+	{
+		for (j = 0; j < mywin->cmd_rect.width; j++)
+		{
+			buf[(i+mywin->cmd_rect.ry)*mywin->sheet->width+j+mywin->cmd_rect.rx]=mywin->cmd_rect.color;
+		}
+	}
 
-	if(r1_x >= rect2->x && r1_x <= r2_x)
-		d_x = r1_x;
-	else if(r2_x >= rect1->x && r2_x <= r1_x)
-		d_x = r2_x;
-	else
-		return FALSE;
 
-	if(r1_y >= rect2->y && r1_y <= r2_y)
-		d_y = r1_y;
-	else if(r2_y >= rect1->y && r2_y <= r1_y)
-		d_y = r2_y;
-	else
-		return FALSE;
-
-	d_rect->width = d_x - d_rect->x + 1;
-	d_rect->height = d_y - d_rect->y + 1;
-	return TRUE;
+	for ( i = 0; i < mywin->close_btn_rect.height; i++)
+	{
+		for (j = 0; j < mywin->close_btn_rect.width; j++)
+		{
+			buf[(i+mywin->close_btn_rect.ry)*mywin->sheet->width+j+mywin->close_btn_rect.rx]=mywin->close_btn_rect.color;
+		}
+	}
 }
+
+void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)
+{
+	win_sheet_put_char(mywin,mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,Blue);
+	//vga_write_char(mywin->sheet->x+mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->sheet->y+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,Blue);
+	mywin->cmd_cursor_x+=VGA_CHAR_WIDTH;//+cursor_side;
+	if (mywin->cmd_cursor_x%mywin->sheet->width==0)
+	{
+		mywin->cmd_cursor_x=0;
+		mywin->cmd_cursor_y+=VGA_CHAR_HEIGHT;
+	}
+	sheet_refresh_rect(sheets);
+	return;
+}
+
+void win_cmd_put_string(MY_WINDOW* mywin,char* s)
+{
+	while (*s!='\0')
+	{
+		win_cmd_put_char(mywin,*(s++));
+	}
+	return;
+}
+
+// void move_win_mouse(MY_WINDOW* mywin)
+// {
+// 	vga_draw_mouse(0,0,Blue);
+// 	while(1);
+
+// }
+void drawmouse(int x,int y){ /* 画鼠标*/
+   static char cursor[12][12] = {
+		"************",
+		"*OOOOOOOOOO*",
+		"*OOOOOOOOO*.",
+		"*OOOOOOOO*..",
+		"*OOOOOOOO*..",
+		"*OOOOOOO*...",
+		"*OOOOOOO*...",
+		"*OOOOOOOO*..",
+		"*OOOO**OOO*.",
+		"*OOO*..*OOO*",
+		"*OO*....*OO*",
+		"*O*......***"
+	};
+   for (int j  = y; j < y+12; j++) {
+		for (int i = x; i < x+12; i++) {
+			if (cursor[j-y][i-x] == '*') {
+				// mouse[y * 16 + x] = COL8_000000;
+            putPoint(i, j, Black);
+			}
+			if (cursor[j-y][i-x] == 'O') {
+				// mouse[y * 16 + x] = COL8_FFFFFF;
+            putPoint(i, j, White);
+			}
+			// if (cursor[j-y][i-x] == '.') {
+			// 	// mouse[y * 16 + x] = back_color;
+            // putPoint(i,j,back_color);
+			// }
+		}
+   }
+}
+

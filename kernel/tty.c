@@ -10,7 +10,8 @@
 #include "keyboard.h"
 #include "x86.h"
 #include "color.h"
-
+#include "sheet.h"
+#include "window.h"
 int current_console; //当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
 int tty_read(TTY *tty, char *buf, int len);
@@ -20,9 +21,9 @@ static void tty_mouse(TTY *tty);
 static void tty_dev_read(TTY *tty);
 static void tty_dev_write(TTY *tty);
 static void put_key(TTY *tty, u32 key);
-
+static void tty_move(TTY *tty);
 void in_process(TTY *p_tty, u32 key)
-{
+{ 
 	int real_line = p_tty->console->orig / SCR_WIDTH;
 
 	if (!(key & FLAG_EXT))
@@ -112,11 +113,11 @@ void task_tty()
 		{
 			do
 			{
-
-				tty_mouse(p_tty);
-				     /* tty判断鼠标操作 */
+				tty_mouse(p_tty);     /* tty判断鼠标操作 */
 				tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
 				tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
+				tty_move(p_tty);
+				while(1);
 
 			} while (p_tty->ibuf_cnt);
 		}
@@ -145,6 +146,7 @@ static void tty_mouse(TTY *tty)
 		int real_line = tty->console->orig / SCR_WIDTH;
 		if (tty->mouse_left_button)
 		{
+
 			if (tty->mouse_Y > MOUSE_UPDOWN_BOUND)
 			{ //按住鼠标左键向上滚动
 				if (tty->console->current_line < 43)
@@ -187,6 +189,23 @@ static void tty_mouse(TTY *tty)
 			tty->mouse_Y = 0;
 		}
 	}
+}
+
+
+static void tty_move(TTY *tty){
+
+    u8* p=(u8 *)K_PHY2LIN(0xa0000);
+
+    sheets=sheets_init(p,320,200);
+	struct sheet* sheet4_mouse = sheet_alloc(sheets);
+	sheet_setsheet(sheet4_mouse, 12, 12, tty->mouse_X, tty->mouse_Y);
+    u8* sheet_buf4=(u8*)sys_malloc(sheet4_mouse->width*sheet4_mouse->height);
+    // drawmouse(tty->mouse_X,tty->mouse_Y);
+    sheet_setbuf(sheet4_mouse,sheet_buf4);
+	sheet_set_layer(sheets,sheet4_mouse,256);
+	sheet_refresh_rect(sheets);
+	// while(1);
+
 }
 
 static void tty_dev_read(TTY *tty)

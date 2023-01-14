@@ -54,11 +54,12 @@ void kb_handler(int irq){
 
 void mouse_handler(int irq){
 	u8 scan_code =  inb(0x60);
-	//kprintf("%d",scan_code);
+	kprintf("i-");
 	if(!mouse_init){
 		mouse_init = 1;
 		return;
 	}
+	// 等待鼠标的三个字节消息全部来到
 	mouse_in.buf[mouse_in.count]=scan_code;
 	mouse_in.count++;
 	if(mouse_in.count==3){
@@ -66,7 +67,7 @@ void mouse_handler(int irq){
 		for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++) {
 			if(p_tty->console==&console_table[current_console]){
 				p_tty->mouse_left_button = mouse_in.buf[0]&0x01;
-				
+				/*没有支持右键*/
 				u8 mid_button = mouse_in.buf[0]&0b100;
 				if(mid_button==0b100){
 					p_tty->mouse_mid_button = 1;

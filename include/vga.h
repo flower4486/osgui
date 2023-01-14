@@ -39,6 +39,7 @@ void vga_write_regs(u8 *regs);
 int vga_update_screen(u8 * buffer, u32 buffer_size);
 
 extern u8 vga_320x200x256[];
-extern u8 vga_640x480x16[];
+extern u8 vga_640x480x16[] ;
+extern u8 vga_80x25_text[];
 #endif // _VGA_H_
 
