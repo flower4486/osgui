@@ -5,40 +5,37 @@ typedef struct _MY_WINDOW MY_WINDOW;
 
 typedef struct _MY_RECT
 {
-	int x;
-	int y;
+	int rx;
+	int ry;
 	int width;
 	int height;
+	u8	color;
 } MY_RECT;
 
 struct _MY_WINDOW
 {
-	int x;
-	int y;
-	int width;
-	int height;
-	u32 * bitmap;
-	//MY_WINDOW_CALLBACK mywin_callback;
-	void * task;
-	u8 need_update;
-	MY_RECT update_rect;
-	MY_WINDOW * next;
-	MY_WINDOW * prev;
-	void * kbd_task;
-	u8 has_title;
-	u8 has_cmd;
+	struct sheet* sheet;
+	//u8* winbuf;
+	
+	MY_WINDOW * nxt;
+	MY_WINDOW * pre;
+
 	MY_RECT title_rect;
 	MY_RECT close_btn_rect;
 	MY_RECT cmd_rect;
+
 	int cmd_cursor_x;
 	int cmd_cursor_y;
-	u32 cmd_font_color;
-	u32 cmd_back_color;
-	u8 cmd_single_line_out;
+	int cmd_font_width;
+	int cmd_font_height;
+
+	u8 cmd_font_color;
 };
 
 
-static int draw_my_window(MY_WINDOW * my_window, 
-		u8 * need_update_mouse,MY_RECT * mouse_update_rect);
-int create_my_window(MY_WINDOW * my_window);
-static u8 detect_intersect_rect(MY_RECT * rect1, MY_RECT * rect2, MY_RECT * d_rect);
+MY_WINDOW* alloc_window();
+void init_window(MY_WINDOW* mywin);
+void draw_win_rect(MY_WINDOW* mywin);
+void win_test();
+void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar);
+void win_cmd_put_string(MY_WINDOW* mywin,char* s);

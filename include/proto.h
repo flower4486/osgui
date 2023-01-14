@@ -9,6 +9,7 @@
 void	disp_str(char* info);
 void	disp_int(int input);
 void	disp_color_str(char* info, int color);
+void write_u8(char ch);
 void write_char(char ch);    //added by mingxuan 2019-5-19
 
 //added by zcr
@@ -64,11 +65,8 @@ void spurious_irq(int irq);
 
 /* clock.c */
 void clock_handler(int irq);
-/*gui.c*/
-void gui();
-void init_gui();
-void cmd_window_write_string(int x, int y, char *s, u32 color, u32 backcolor);
-void rectangle(int x1, int y1, int x2, int y2, int Color); /* 画一矩形*/
+
+
 
 /***************************************************************
 * 以下是系统调用相关函数的声明	

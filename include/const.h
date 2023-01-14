@@ -80,7 +80,7 @@
 
 /* TTY */
 //added by mingxuan 2019-5-19
-#define NR_CONSOLES	3	/* consoles */
+#define NR_CONSOLES	4	/* consoles */
 
 /*页表相关*/
 #define	PageTblNumAddr		0x500	//页表数量放在这个位置,必须与load.inc中一致					add by visual 2016.5.11

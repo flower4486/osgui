@@ -51,3 +51,6 @@ struct memfree{
 #include "fs_const.h"
 #include "hd.h"
 extern struct hd_info hd_info[1];   //added by mingxuan 2020-10-27
+
+
+extern struct sheets* sheets;

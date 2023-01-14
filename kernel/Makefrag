@@ -6,6 +6,7 @@ KERN_SRCFILES :=kernel/kernel.asm	\
 		kernel/gui.c\
 		kernel/vga.c\
 		kernel/window.c\
+		kernel/sheet.c\
 		kernel/hd.c	\
 		kernel/fat32.c	\
 		kernel/tty.c	\
