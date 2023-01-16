@@ -39,28 +39,6 @@ void mouse_handler(int irq)
 		//kprintf("%d ",mouse_in.buf[0]);
 		p_tty->mouse_left_button = mouse_in.buf[0] & 0x01;
 		p_tty->mouse_mid_button = mouse_in.buf[0] & 0x4;
-<<<<<<< HEAD
-		u8 dx_sign = mouse_in.buf[0] & 0x10;
-		u8 dy_sign = mouse_in.buf[0] & 0x20;
-		// u8 dx = mouse_in.buf[1];
-		// u8 dy = mouse_in.buf[2];
-		int dx,dy;
-
-		if(dy_sign==0x20){//down
-			dy = 1;
-			// kprintf("a%d ",p_tty->mouse_Y);
-		}else{//up
-			dy = -1;
-			// kprintf("b%d ",p_tty->mouse_Y);
-		}
-
-		if(dx_sign==0x10){//left
-			dx = -1;
-		}else{//right
-			dx = 1;
-		}
-
-=======
 		u8 dx_sign = mouse_in.buf[0]&0x10;
 		u8 dy_sign = mouse_in.buf[0]&0x20;
 		//kprintf("%d %d ",x,-y);
@@ -78,8 +56,7 @@ void mouse_handler(int irq)
 		}
 		sheet_mouse->x+=dx;
 		sheet_mouse->y+=dy;
-		 
->>>>>>> add5a8f160b472d1a65ebf5454f1b1bf48f62680
+
 		mouse_in.count = 0;
 	}
 
