@@ -21,7 +21,7 @@
 #include "x86.h"
 #include "assert.h"
 #include "stdio.h"
-
+#include "sheet.h"
 static int initialize_processes();	//added by xw, 18/5/26
 static int initialize_cpus();		//added by xw, 18/6/2
 
@@ -32,8 +32,6 @@ int kernel_main()
 {
 	int error;
 	gui_mode=0;
-//	gui();
-
 	disp_pos = 0;
 	for (int i = 0; i < 25; i++) {
 		for (int j = 0; j < 80; j++) {
@@ -114,7 +112,7 @@ int kernel_main()
 	 * note that disp_xx can't work after this function is invoked until processes runs.
 	 * add by visual 2016.5.13; moved by xw, 18/5/30
 	 */
-	//clear_kernel_pagepte_low();
+	clear_kernel_pagepte_low();
 	
 	p_proc_current = proc_table;
 	kernel_initial = 0;	//kernel initialization is done. added by xw, 18/5/31

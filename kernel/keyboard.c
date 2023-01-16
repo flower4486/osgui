@@ -11,11 +11,10 @@
 #include "keymap.h"
 #include "x86.h"
 #include  "stdio.h"
+#include "mouse.h"
 
 
 static KB_INPUT kb_in;
-static MOUSE_INPUT mouse_in;
-static int mouse_init;
 
 static	int		code_with_E0;
 static	int		shift_l;	/* l shift state	*/
@@ -49,63 +48,8 @@ void kb_handler(int irq){
 
 };
 
-#define TTY_FIRST (tty_table)
-#define TTY_END (tty_table+NR_CONSOLES)
-
-void mouse_handler(int irq){
-	u8 scan_code =  inb(0x60);
-	kprintf("i-");
-	if(!mouse_init){
-		mouse_init = 1;
-		return;
-	}
-	// 等待鼠标的三个字节消息全部来到
-	mouse_in.buf[mouse_in.count]=scan_code;
-	mouse_in.count++;
-	if(mouse_in.count==3){
-		TTY* p_tty;
-		for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++) {
-			if(p_tty->console==&console_table[current_console]){
-				p_tty->mouse_left_button = mouse_in.buf[0]&0x01;
-				/*没有支持右键*/
-				u8 mid_button = mouse_in.buf[0]&0b100;
-				if(mid_button==0b100){
-					p_tty->mouse_mid_button = 1;
-				}else{
-					p_tty->mouse_mid_button = 0;
-				}
-
-				if(p_tty->mouse_left_button){
-					u8 dir_Y = mouse_in.buf[0]&0x20;
-					u8 dir_X = mouse_in.buf[0]&0x10;
-					if(dir_Y==0x20){//down
-						p_tty->mouse_Y -= 1;
-					}else{//up
-						p_tty->mouse_Y += 1;
-					}
-
-					if(dir_X==0x10){//left
-						p_tty->mouse_X -= 1;
-					}else{//right
-						p_tty->mouse_X += 1;
-					}
-				}
-			}
-		}
-		
-		mouse_in.count=0;
-	}
 
 
-}
-
-void init_mouse(){
-	mouse_in.count = 0;
-	
-	put_irq_handler(MOUSE_IRQ,mouse_handler);
-	enable_irq(MOUSE_IRQ);
-
-}
 
 void init_kb(){
 	kb_in.count = 0;

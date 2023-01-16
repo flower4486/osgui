@@ -16,49 +16,43 @@
 #include "sheet.h"
 
 struct sheets* sheets;
-// void sheet_test(){
-//     disable_int();
-//      u8* p=(u8 *)K_PHY2LIN(0xa0000);
-//     /// ////////////////////
-//     sheets=sheets_init(p,320,200);
-//     struct sheet* sheet1=sheet_alloc(sheets);
-//     struct sheet* sheet2=sheet_alloc(sheets);
-//     struct sheet* sheet3=sheet_alloc(sheets);
-//     struct sheet* sheet4_mouse = sheet_alloc(sheets);
+void sheet_test(){
+    disable_int();
+   
+    /// ////////////////////
+    struct sheet* sheet1=sheet_alloc(sheets);
+    struct sheet* sheet2=sheet_alloc(sheets);
+    struct sheet* sheet3=sheet_alloc(sheets);
     
-//     sheet_setsheet(sheet1,100,100,0,0);
-//     u8* sheet_buf1=(u8*)sys_malloc(sheet1->height*sheet1->width);
-//     memset(sheet_buf1,Blue,sheet1->height*sheet1->width);
-//     sheet_setbuf(sheet1,sheet_buf1);
-
     
-//     sheet_setsheet(sheet2,100,100,100,0);
-//     u8* sheet_buf2=(u8*)sys_malloc(sheet2->height*sheet2->width);
-//     memset(sheet_buf2,Red,sheet2->height*sheet2->width);
-//     sheet_setbuf(sheet2,sheet_buf2);
-
-
-//     sheet_setsheet(sheet3,100,100,200,0);
-//     u8* sheet_buf3=(u8*)sys_malloc(sheet3->width*sheet3->height);
-//     memset(sheet_buf3,Yellow,sheet3->width*sheet3->height);
-//     sheet_setbuf(sheet3,sheet_buf3);
+    sheet_setsheet(sheet1,100,100,0,0);
+    u8* sheet_buf1=(u8*)sys_malloc(sheet1->height*sheet1->width);
+    memset(sheet_buf1,Blue,sheet1->height*sheet1->width);
+    sheet_setbuf(sheet1,sheet_buf1);
 
     
-//     sheet_setsheet(sheet4_mouse,12,12,0,0);
-//     u8* sheet_buf4=(u8*)sys_malloc(sheet4_mouse->width*sheet4_mouse->height);
-//     drawmouse(0,0);
-//     sheet_setbuf(sheet4_mouse,sheet_buf4);
+    sheet_setsheet(sheet2,100,100,100,0);
+    u8* sheet_buf2=(u8*)sys_malloc(sheet2->height*sheet2->width);
+    memset(sheet_buf2,Red,sheet2->height*sheet2->width);
+    sheet_setbuf(sheet2,sheet_buf2);
 
-//     sheet_set_layer(sheets,sheet1,3);
-//     sheet_set_layer(sheets,sheet2,5);
-//     sheet_set_layer(sheets,sheet3,8);
-//     sheet_set_layer(sheets,sheet4_mouse,256);
-//     sheet_refresh_rect(sheets);
 
-//      sheet_slide(sheets,sheet3,150,0);
-//     // sheet_slide(sheets,sheet1,200,0);
-//     enable_int();
-// }
+    sheet_setsheet(sheet3,100,100,200,0);
+    u8* sheet_buf3=(u8*)sys_malloc(sheet3->width*sheet3->height);
+    memset(sheet_buf3,Yellow,sheet3->width*sheet3->height);
+    sheet_setbuf(sheet3,sheet_buf3);
+
+    
+    sheet_set_layer(sheets,sheet1,3);
+    sheet_set_layer(sheets,sheet2,5);
+    sheet_set_layer(sheets,sheet3,8);
+    
+    sheet_refresh_rect(sheets);
+
+     sheet_slide(sheets,sheet3,150,0);
+    // sheet_slide(sheets,sheet1,200,0);
+    enable_int();
+}
 
 void set_bkcolor(struct sheets* sheets,int color)
 {
@@ -117,6 +111,7 @@ void sheet_setsheet(struct sheet *sheet,int width, int height,int x,int y)
     sheet->height = height;
     sheet->x=x;
     sheet->y=y;
+    sheet_refresh_rect(sheets);
     return;
 }
 
