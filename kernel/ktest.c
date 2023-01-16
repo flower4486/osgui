@@ -14,6 +14,7 @@
 #include "vfs.h"
 #include "string.h"
 #include "color.h"
+#include "mouse.h"
 
 /**
  * @struct posix_tar_header
@@ -128,9 +129,8 @@ void initial()
 	do_vclose(stdout);
 	do_vclose(stderr);
 	
-	//cmd_window_write_string(20,100,"hello",Blue,Red);
-	
+
 	//exec("orange/shell_0.bin");
-	exec("orange/test.bin");
+	//exec("orange/test.bin");
 	while(1);
 }

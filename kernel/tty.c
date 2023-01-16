@@ -12,7 +12,8 @@
 #include "color.h"
 #include "sheet.h"
 #include "window.h"
-int current_console; //当前显示在屏幕上的console
+#include "vga.h"
+int current_console; // 当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
 int tty_read(TTY *tty, char *buf, int len);
 
@@ -21,9 +22,9 @@ static void tty_mouse(TTY *tty);
 static void tty_dev_read(TTY *tty);
 static void tty_dev_write(TTY *tty);
 static void put_key(TTY *tty, u32 key);
-static void tty_move(TTY *tty);
+
 void in_process(TTY *p_tty, u32 key)
-{ 
+{
 	int real_line = p_tty->console->orig / SCR_WIDTH;
 
 	if (!(key & FLAG_EXT))
@@ -83,9 +84,30 @@ void in_process(TTY *p_tty, u32 key)
 		}
 	}
 }
-
-#define TTY_FIRST (tty_table)
-#define TTY_END (tty_table + NR_CONSOLES)
+static void tty_mouse_move(TTY *tty)
+{
+	if (sheets == NULL&&sheet_mouse==NULL)
+	{
+		sheets = sheets_init((u8 *)K_PHY2LIN(0xa0000), 320, 200);
+		sheet_mouse = sheet_alloc(sheets);
+		u8 *sheet_buf4 = (u8 *)sys_malloc(sheet_mouse->width * sheet_mouse->height);
+		drawmouse(sheet_buf4);
+		sheet_setbuf(sheet_mouse, sheet_buf4);
+		sheet_setsheet(sheet_mouse, 12, 12, 100, 100);
+	}else if(sheets != NULL&&sheet_mouse==NULL){
+		sheet_mouse = sheet_alloc(sheets);
+		u8 *sheet_buf4 = (u8 *)sys_malloc(sheet_mouse->width * sheet_mouse->height);
+		drawmouse(sheet_buf4);
+		sheet_setbuf(sheet_mouse, sheet_buf4);
+		sheet_setsheet(sheet_mouse, 12, 12, 100, 100);
+	}
+	else
+	{
+		sheet_setsheet(sheet_mouse, 12, 12, tty->mouse_X, tty->mouse_Y);
+	}
+	sheet_refresh_rect(sheets);
+	return;
+}
 
 void task_tty()
 {
@@ -98,26 +120,32 @@ void task_tty()
 
 	select_console(0);
 
-	//设置第一个tty光标位置，第一个tty需要特殊处理
+	// 设置第一个tty光标位置，第一个tty需要特殊处理
 	disable_int();
 	outb(CRTC_ADDR_REG, CURSOR_H);
 	outb(CRTC_DATA_REG, ((disp_pos / 2) >> 8) & 0xFF);
 	outb(CRTC_ADDR_REG, CURSOR_L);
 	outb(CRTC_DATA_REG, (disp_pos / 2) & 0xFF);
 	enable_int();
-
-	//轮询
+	// 轮询
 	while (1)
 	{
+
 		for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++)
 		{
 			do
 			{
-				tty_mouse(p_tty);     /* tty判断鼠标操作 */
+				// if (gui_mode == 1)
+				// {
+				// 	tty_mouse_move(p_tty);
+				// }
+				// else
+				{
+					tty_mouse(p_tty); /* tty判断鼠标操作 */
+				}
+
 				tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
 				tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
-				tty_move(p_tty);
-				while(1);
 
 			} while (p_tty->ibuf_cnt);
 		}
@@ -148,7 +176,7 @@ static void tty_mouse(TTY *tty)
 		{
 
 			if (tty->mouse_Y > MOUSE_UPDOWN_BOUND)
-			{ //按住鼠标左键向上滚动
+			{ // 按住鼠标左键向上滚动
 				if (tty->console->current_line < 43)
 				{
 					disable_int();
@@ -162,7 +190,7 @@ static void tty_mouse(TTY *tty)
 				}
 			}
 			else if (tty->mouse_Y < -MOUSE_UPDOWN_BOUND)
-			{ //按住鼠标左键向下滚动
+			{ // 按住鼠标左键向下滚动
 				if (tty->console->current_line > 0)
 				{
 					disable_int();
@@ -178,7 +206,7 @@ static void tty_mouse(TTY *tty)
 		}
 
 		if (tty->mouse_mid_button)
-		{ //点击中键复原
+		{ // 点击中键复原
 			disable_int();
 			tty->console->current_line = 0;
 			outb(CRTC_ADDR_REG, START_ADDR_H);
@@ -189,23 +217,6 @@ static void tty_mouse(TTY *tty)
 			tty->mouse_Y = 0;
 		}
 	}
-}
-
-
-static void tty_move(TTY *tty){
-
-    u8* p=(u8 *)K_PHY2LIN(0xa0000);
-
-    sheets=sheets_init(p,320,200);
-	struct sheet* sheet4_mouse = sheet_alloc(sheets);
-	sheet_setsheet(sheet4_mouse, 12, 12, tty->mouse_X, tty->mouse_Y);
-    u8* sheet_buf4=(u8*)sys_malloc(sheet4_mouse->width*sheet4_mouse->height);
-    // drawmouse(tty->mouse_X,tty->mouse_Y);
-    sheet_setbuf(sheet4_mouse,sheet_buf4);
-	sheet_set_layer(sheets,sheet4_mouse,256);
-	sheet_refresh_rect(sheets);
-	// while(1);
-
 }
 
 static void tty_dev_read(TTY *tty)

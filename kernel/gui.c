@@ -16,6 +16,7 @@
 #include "window.h"
 #include "sheet.h"
 #include "gui.h"
+#include "mouse.h"
 
 void gui()
 {
@@ -25,23 +26,28 @@ void gui()
    gui_mode=1;
    //int p;
    u8* p=(u8 *)memstart;
+   if(sheets==NULL)
+	sheets=sheets_init(p,320,200);
    //Paint the screen black
    //memset(p,Black,memsize);
   //sheet_test();
    disable_int();
-     
-   sheets=sheets_init(p,320,200);
+     //bga_set_resolution(1024,768);
    set_bkcolor(sheets,Black);
    sheet_refresh_rect(sheets);
+   sheet_mouse=sheet_alloc(sheets);
+	u8* sheet_buf4=(u8*)sys_malloc(sheet_mouse->width*sheet_mouse->height);
+   drawmouse(sheet_buf4);
+   sheet_setbuf(sheet_mouse,sheet_buf4);
+	sheet_set_layer(sheets,sheet_mouse,200);
    
-   // win_test();
-   sheet_test();
+   //win_test();
    enable_int();
    // for (int i =0; i < memsize; i++)
    // {
    //    *(p++)=0x1;
    // }
-
+   //memset((u8*)K_PHY2LIN(0xA0000),Blue,0x1ffff);
    //cmd_window_write_string(100,100,"hello,os",Red,Blue);
    //memset((u8*)memstart,Red,320*200);
    //drawline(20,20,200,Red);
@@ -104,31 +110,6 @@ void rectangle(int x1, int y1, int x2, int y2, int Color) /* 画一矩形*/
          else
          {
             putPoint(x + j, y + i, backColour);
-         }
-      }
-   }
-   return;
-}
-void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u8 color,u8 bkcolor)
-{
-    if (achar > 128)
-   {
-      achar = 4;
-   }
-   u8 *c = number_font[achar];
-
-   for (int i = 0; i < VGA_CHAR_HEIGHT; ++i)
-   {
-      for (int j = 0; j < VGA_CHAR_WIDTH; ++j)
-      {
-
-         if (c[i] & (1 << (8 - j)))
-         {
-           *(mywin->sheet->buf+j+x+mywin->sheet->width*(y+i))=color;
-         }
-         else
-         {
-            *(mywin->sheet->buf+j+x+mywin->sheet->width*(y+i))=bkcolor;
          }
       }
    }

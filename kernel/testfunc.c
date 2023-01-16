@@ -12,6 +12,7 @@
 #include "global.h"
 #include "proto.h"
 #include "gui.h"
+
 /* 
  * This syscall needs long time to finish, so we can use it 
  * to check if our os is kernel-preemptive.

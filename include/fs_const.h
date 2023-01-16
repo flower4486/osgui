@@ -5,7 +5,7 @@
  */
 
 /* TTY */
-#define NR_CONSOLES	4	/* consoles */
+#define NR_CONSOLES	3	/* consoles */
 
 /* max() & min() */
 #define	max(a,b)	((a) > (b) ? (a) : (b))

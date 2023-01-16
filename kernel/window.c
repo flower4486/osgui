@@ -28,22 +28,22 @@ MY_WINDOW * mywin_list_end = NULL;
 MY_WINDOW * mywin_list_kbd_input = NULL;
 
 
-// void win_test()
-// {
-// 	struct sheets* s=sheets;
-// 	MY_WINDOW* mywin=alloc_window();
-// 	init_window(mywin);
-// 	draw_win_rect(mywin);
+void win_test()
+{
+	struct sheets* s=sheets;
+	MY_WINDOW* mywin=alloc_window();
+	init_window(mywin);
+	draw_win_rect(mywin);
 
-// 	MY_WINDOW* mywin2=alloc_window();
-// 	// init_window(mywin2);
-// 	// draw_win_rect(mywin2);
-// 	sheet_slide(sheets,mywin2->sheet,100,100);
+	MY_WINDOW* mywin2=alloc_window();
+	init_window(mywin2);
+	draw_win_rect(mywin2);
+	sheet_slide(sheets,mywin2->sheet,100,100);
 
-// 	// win_cmd_put_string(mywin2,"hello,my gui");
-// 	// vga_draw_mouse(0,0,Red,Blue);
-// 	drawmouse(0,0);
-// }
+	win_cmd_put_string(mywin2,"hello,my gui");
+	
+	
+}
 
 MY_WINDOW* alloc_window()
 {
@@ -128,7 +128,7 @@ void draw_win_rect(MY_WINDOW* mywin)
 	}
 
 
-	for ( i = 0; i < mywin->cmd_rect.height; i++)
+		for ( i = 0; i < mywin->cmd_rect.height; i++)
 	{
 		for (j = 0; j < mywin->cmd_rect.width; j++)
 		{
@@ -137,7 +137,7 @@ void draw_win_rect(MY_WINDOW* mywin)
 	}
 
 
-	for ( i = 0; i < mywin->close_btn_rect.height; i++)
+		for ( i = 0; i < mywin->close_btn_rect.height; i++)
 	{
 		for (j = 0; j < mywin->close_btn_rect.width; j++)
 		{
@@ -169,13 +169,8 @@ void win_cmd_put_string(MY_WINDOW* mywin,char* s)
 	return;
 }
 
-// void move_win_mouse(MY_WINDOW* mywin)
-// {
-// 	vga_draw_mouse(0,0,Blue);
-// 	while(1);
-
-// }
-void drawmouse(int x,int y){ /* 画鼠标*/
+void drawmouse(u8* buf)
+{ /* 画鼠标*/
    static char cursor[12][12] = {
 		"************",
 		"*OOOOOOOOOO*",
@@ -190,21 +185,39 @@ void drawmouse(int x,int y){ /* 画鼠标*/
 		"*OO*....*OO*",
 		"*O*......***"
 	};
-   for (int j  = y; j < y+12; j++) {
-		for (int i = x; i < x+12; i++) {
-			if (cursor[j-y][i-x] == '*') {
-				// mouse[y * 16 + x] = COL8_000000;
-            putPoint(i, j, Black);
+   for (int j  = 0; j < 12; j++) {
+		for (int i = 0; i < 12; i++) {
+			if (cursor[j][i] == '*') {
+				*(buf+i+j*12)=Black;
 			}
-			if (cursor[j-y][i-x] == 'O') {
-				// mouse[y * 16 + x] = COL8_FFFFFF;
-            putPoint(i, j, White);
+			if (cursor[j][i] == 'O') {
+				*(buf+i+j*12)=White;
 			}
-			// if (cursor[j-y][i-x] == '.') {
-			// 	// mouse[y * 16 + x] = back_color;
-            // putPoint(i,j,back_color);
-			// }
 		}
    }
 }
+void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u8 color,u8 bkcolor)
+{
+    if (achar > 128)
+   {
+      achar = 4;
+   }
+   u8 *c = number_font[achar];
 
+   for (int i = 0; i < VGA_CHAR_HEIGHT; ++i)
+   {
+      for (int j = 0; j < VGA_CHAR_WIDTH; ++j)
+      {
+
+         if (c[i] & (1 << (8 - j)))
+         {
+           *(mywin->sheet->buf+j+x+mywin->sheet->width*(y+i))=color;
+         }
+         else
+         {
+            *(mywin->sheet->buf+j+x+mywin->sheet->width*(y+i))=bkcolor;
+         }
+      }
+   }
+   return;
+}
