@@ -59,9 +59,9 @@ void set_bkcolor(struct sheets* sheets,int color)
     disable_int();
     struct sheet* bksheet=sheet_alloc(sheets);
     sheet_setsheet(bksheet,320,200,0,0);
-    u8* bksheet_buf=(u8*)sys_malloc(320*200);
-    memset(bksheet_buf,color,320*200);
-    sheet_setbuf(bksheet,bksheet_buf);
+    
+    memset(bk_buffer,color,320*200);
+    sheet_setbuf(bksheet,bk_buffer);
     sheet_set_layer(sheets,bksheet,0);
     enable_int();
 }
@@ -205,13 +205,16 @@ void sheet_refresh_rect(struct sheets *sheets)
 
     while (sheet_cur!=NULL)
     {
+        disable_int();
         int offset=sheet_cur->sheet->x+sheet_cur->sheet->y*320;
         for (int i = 0; i < sheet_cur->sheet->height; i++)
         {
            memcpy(sheets->videostart+offset,(sheet_cur->sheet->buf+sheet_cur->sheet->width*i),sheet_cur->sheet->width);
            offset+=320;
         }
+        enable_int();
         sheet_cur=sheet_cur->nxt;
+        
     }    
 }
 
