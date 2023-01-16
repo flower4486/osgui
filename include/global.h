@@ -56,6 +56,8 @@ extern struct hd_info hd_info[1];   //added by mingxuan 2020-10-27
 
 extern struct sheets* sheets;
 extern struct sheet* sheet_mouse;
+extern u8 sheet_buffer[];
+extern u8 bk_buffer[];
 
 #define TTY_FIRST (tty_table)
 #define TTY_END (tty_table + NR_CONSOLES)

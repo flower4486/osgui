@@ -36,10 +36,17 @@ void gui()
    set_bkcolor(sheets,Black);
    sheet_refresh_rect(sheets);
    sheet_mouse=sheet_alloc(sheets);
-	u8* sheet_buf4=(u8*)sys_malloc(sheet_mouse->width*sheet_mouse->height);
-   drawmouse(sheet_buf4);
-   sheet_setbuf(sheet_mouse,sheet_buf4);
+	//u8* sheet_buf4;
+   //u8* sheet_buffer=0;
+   //sheet_buf4=(u8*)sys_malloc(sheet_mouse->width*sheet_mouse->height);
+   drawmouse(sheet_buffer);
+   sheet_setbuf(sheet_mouse,sheet_buffer);
 	sheet_set_layer(sheets,sheet_mouse,200);
+   sheet_setsheet(sheet_mouse,12,12,100,100);
+   
+   {
+     
+   }
    
    //win_test();
    enable_int();

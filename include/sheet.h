@@ -9,6 +9,7 @@ struct sheet
 {
     u8 *buf;
     int width,height,x,y,isuse,id;
+    
 };
 struct sheets
 {
