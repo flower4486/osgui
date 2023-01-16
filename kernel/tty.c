@@ -130,23 +130,17 @@ void task_tty()
 	// 轮询
 	while (1)
 	{
-
+		if (gui_mode == 1)
+		{
+			sheet_refresh_rect(sheets);
+		}
 		for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++)
 		{
 			do
 			{
-				// if (gui_mode == 1)
-				// {
-				// 	tty_mouse_move(p_tty);
-				// }
-				// else
-				{
-					tty_mouse(p_tty); /* tty判断鼠标操作 */
-				}
-
-				tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
-				tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
-
+				//tty_mouse(p_tty); /* tty判断鼠标操作 */
+				//tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
+				//tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
 			} while (p_tty->ibuf_cnt);
 		}
 	}

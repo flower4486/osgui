@@ -13,6 +13,7 @@
 #include "stdio.h"
 #include "sheet.h"
 #include "window.h"
+#include "mouse.h"
 static MOUSE_INPUT mouse_in;
 static int mouse_init;
 struct sheet *sheet_mouse;
@@ -38,14 +39,24 @@ void mouse_handler(int irq)
 		//kprintf("%d ",mouse_in.buf[0]);
 		p_tty->mouse_left_button = mouse_in.buf[0] & 0x01;
 		p_tty->mouse_mid_button = mouse_in.buf[0] & 0x4;
-		u8 x = mouse_in.buf[1];
-		u8 y = mouse_in.buf[2];
-		kprintf("%d %d ",x,-y);
-
-		if (gui_mode == 1)
-		{
-			sheet_setsheet(sheet_mouse, 12, 12, x+sheet_mouse->x, sheet_mouse->y-y);
+		u8 dx_sign = mouse_in.buf[0]&0x10;
+		u8 dy_sign = mouse_in.buf[0]&0x20;
+		//kprintf("%d %d ",x,-y);
+		int dx,dy;
+		if(dy_sign==0x20){
+			//down
+			dy=1;
+		}else{
+			dy=-1;
 		}
+		if(dx_sign==0x10){
+			dx=-1;
+		}else{
+			dx=1;
+		}
+		sheet_mouse->x+=dx;
+		sheet_mouse->y+=dy;
+		 
 		mouse_in.count = 0;
 	}
 
