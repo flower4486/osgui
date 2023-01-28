@@ -7,7 +7,8 @@
 #define SHEET_NOT_USE 0
 struct sheet
 {
-    u8 *buf;
+    // u8 *buf;
+    u8 buffer[];
     int width,height,x,y,isuse,id;
     
 };
