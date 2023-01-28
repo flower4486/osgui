@@ -55,8 +55,6 @@ void mouse_handler(int irq)
 		}else{
 			dx=1;
 		}
-
-		<<<<<<< master
 		//sheet_mouse->x+=6*dx;
 		//sheet_mouse->y+=5*dy;
 		if (gui_mode==1)
@@ -70,13 +68,9 @@ void mouse_handler(int irq)
 		 
 		}
 		
-// =======2023-01-28 
-// 		sheet_mouse->x+=dx;
-// 		sheet_mouse->y+=dy;
-
-// >>>>>>> master
 		mouse_in.count = 0;
 	}
+
 	
 }
 
