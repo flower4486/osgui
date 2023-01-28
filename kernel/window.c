@@ -12,21 +12,18 @@
 #include "vga.h"
 #include "gui.h"
 
-//vga.c
-extern u32 * lfb_vid_memory;
-extern u16 lfb_resolution_x;
-extern u16 lfb_resolution_y;
-extern u16 lfb_resolution_b;
+
 //font.h included in vga.c
 extern u8 number_font[][12];
 extern u8 term_cursor_font[][12];
-
+//mouse.c
+extern struct sheet* mouse_bind_sheet;
 
 //list of windows
 MY_WINDOW * mywin_list_header = NULL;
 MY_WINDOW * mywin_list_end = NULL;
 MY_WINDOW * mywin_list_kbd_input = NULL;
-
+MY_WINDOW* mywin2;
 
 void win_test()
 {
@@ -35,19 +32,22 @@ void win_test()
 	init_window(mywin);
 	draw_win_rect(mywin);
 
-	MY_WINDOW* mywin2=alloc_window();
+	//MY_WINDOW* 
+	mywin2=alloc_window();
 	init_window(mywin2);
 	draw_win_rect(mywin2);
 	sheet_slide(sheets,mywin2->sheet,100,100);
 
 	win_cmd_put_string(mywin2,"hello,my gui");
-	
-	
+	//win_cmd_put_char(mywin2,'l');
+	mouse_bind_sheet=mywin2->sheet;
+	//sheets->need_update=TRUE;
+   //sheet_refresh_rect(sheets);
 }
 
 MY_WINDOW* alloc_window()
 {
-	MY_WINDOW* mywin=(MY_WINDOW*)sys_malloc(sizeof(MY_WINDOW));
+	MY_WINDOW* mywin=(MY_WINDOW*)sys_kmalloc(sizeof(MY_WINDOW));
 	memset((u8*)mywin,0,sizeof(MY_WINDOW));
 
 	mywin->sheet=sheet_alloc(sheets);
@@ -81,31 +81,31 @@ MY_WINDOW* alloc_window()
 
 void init_window(MY_WINDOW* mywin)
 {
-	sheet_setsheet(mywin->sheet,200,100,20,20);
-	u8* winbuf=(u8*)sys_malloc(mywin->sheet->width*mywin->sheet->height);
-
-	sheet_setbuf(mywin->sheet,winbuf);
+	sheet_setsheet(mywin->sheet,500,300,200,200);
+	 u32* winbuf=(u32*)sys_malloc(mywin->sheet->width*mywin->sheet->height*4);
+	 fastset(winbuf,0,mywin->sheet->height*mywin->sheet->width);
+	 sheet_setbuf(mywin->sheet,winbuf);
 	sheet_set_layer(sheets,mywin->sheet,100);
 
 	mywin->title_rect.height=VGA_CHAR_HEIGHT;
 	mywin->title_rect.width=0.9*mywin->sheet->width;
 	mywin->title_rect.rx=0;
 	mywin->title_rect.ry=0;
-	mywin->title_rect.color=Yellow;
+	mywin->title_rect.color=rgb_Yellow;
 
 	mywin->close_btn_rect.height=VGA_CHAR_HEIGHT;
 	mywin->close_btn_rect.width=0.1*mywin->sheet->width;
 	mywin->close_btn_rect.rx=0.9*mywin->sheet->width;
 	mywin->close_btn_rect.ry=0;
-	mywin->close_btn_rect.color=Red;
+	mywin->close_btn_rect.color=rgb_Red;
 
 	mywin->cmd_rect.height=mywin->sheet->height-12;
 	mywin->cmd_rect.width=mywin->sheet->width;
 	mywin->cmd_rect.rx=0;
 	mywin->cmd_rect.ry=12;
-	mywin->cmd_rect.color=Blue;
+	mywin->cmd_rect.color=rgb_Blue;
 
-	mywin->cmd_font_color=White;
+	mywin->cmd_font_color=rgb_White;
 
 	mywin->cmd_cursor_x=0;
 	mywin->cmd_cursor_y=0;
@@ -117,13 +117,13 @@ void init_window(MY_WINDOW* mywin)
 void draw_win_rect(MY_WINDOW* mywin)
 {
 	struct sheets* s=sheets;
-	u8* buf=mywin->sheet->buf;
+	u32* buf=mywin->sheet->buf;
 	int i,j;
 	for ( i = 0; i < mywin->title_rect.height; i++)
 	{
 		for (j = 0; j < mywin->title_rect.width; j++)
 		{
-			buf[(i+mywin->title_rect.ry)*mywin->sheet->width+j+mywin->title_rect.rx]=mywin->title_rect.color;
+			*(buf+(i+mywin->title_rect.ry)*mywin->sheet->width+j+mywin->title_rect.rx)=mywin->title_rect.color;
 		}
 	}
 
@@ -132,7 +132,7 @@ void draw_win_rect(MY_WINDOW* mywin)
 	{
 		for (j = 0; j < mywin->cmd_rect.width; j++)
 		{
-			buf[(i+mywin->cmd_rect.ry)*mywin->sheet->width+j+mywin->cmd_rect.rx]=mywin->cmd_rect.color;
+			*(buf+(i+mywin->cmd_rect.ry)*mywin->sheet->width+j+mywin->cmd_rect.rx)=mywin->cmd_rect.color;
 		}
 	}
 
@@ -141,14 +141,16 @@ void draw_win_rect(MY_WINDOW* mywin)
 	{
 		for (j = 0; j < mywin->close_btn_rect.width; j++)
 		{
-			buf[(i+mywin->close_btn_rect.ry)*mywin->sheet->width+j+mywin->close_btn_rect.rx]=mywin->close_btn_rect.color;
+			*(buf+(i+mywin->close_btn_rect.ry)*mywin->sheet->width+j+mywin->close_btn_rect.rx)=mywin->close_btn_rect.color;
 		}
 	}
+
+	sheets->need_update=TRUE;
 }
 
 void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)
 {
-	win_sheet_put_char(mywin,mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,Blue);
+	win_sheet_put_char(mywin,mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,rgb_Blue);
 	//vga_write_char(mywin->sheet->x+mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->sheet->y+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,Blue);
 	mywin->cmd_cursor_x+=VGA_CHAR_WIDTH;//+cursor_side;
 	if (mywin->cmd_cursor_x%mywin->sheet->width==0)
@@ -156,7 +158,7 @@ void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)
 		mywin->cmd_cursor_x=0;
 		mywin->cmd_cursor_y+=VGA_CHAR_HEIGHT;
 	}
-	sheet_refresh_rect(sheets);
+	
 	return;
 }
 
@@ -169,7 +171,7 @@ void win_cmd_put_string(MY_WINDOW* mywin,char* s)
 	return;
 }
 
-void drawmouse(u8* buf)
+void drawmouse(u32* buf)
 { /* 画鼠标*/
    static char cursor[12][12] = {
 		"************",
@@ -188,15 +190,15 @@ void drawmouse(u8* buf)
    for (int j  = 0; j < 12; j++) {
 		for (int i = 0; i < 12; i++) {
 			if (cursor[j][i] == '*') {
-				*(buf+i+j*12)=Black;
+				*(buf+i+j*12)=rgb_Black;
 			}
 			if (cursor[j][i] == 'O') {
-				*(buf+i+j*12)=White;
+				*(buf+i+j*12)=rgb_White;
 			}
 		}
    }
 }
-void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u8 color,u8 bkcolor)
+void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u32 color,u32 bkcolor)
 {
     if (achar > 128)
    {
@@ -219,5 +221,7 @@ void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u8 color,u8 bkcol
          }
       }
    }
+	sheets->need_update=TRUE;
+
    return;
 }

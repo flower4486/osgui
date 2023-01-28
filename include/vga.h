@@ -44,3 +44,4 @@ extern u8 vga_80x25_text[];
 #endif // _VGA_H_
 
 extern void bga_set_resolution(u32 width, u32 height);
+extern void _tty();

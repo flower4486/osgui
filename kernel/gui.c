@@ -17,38 +17,58 @@
 #include "sheet.h"
 #include "gui.h"
 #include "mouse.h"
-
+#include "pci.h"
+#include "bga.h"
 void gui()
 {
-   vga_write_regs(vga_320x200x256);
+   // vga_write_regs(vga_320x200x256);
  //  open gui mode
    //vga_write_regs(vga_80x25_text);
-   gui_mode=1;
+   
    //int p;
-   u8* p=(u8 *)memstart;
-   if(sheets==NULL)
-	sheets=sheets_init(p,320,200);
+   //u8* p=(u8 *)memstart;
+   //if(sheets==NULL)
+	
    //Paint the screen black
    //memset(p,Black,memsize);
   //sheet_test();
-   disable_int();
+   //disable_int();
      //bga_set_resolution(1024,768);
-   set_bkcolor(sheets,Black);
-   sheet_refresh_rect(sheets);
-   sheet_mouse=sheet_alloc(sheets);
+  
+   //sheet_refresh_rect(sheets);
+  //sheet_mouse=sheet_alloc(sheets);
 	//u8* sheet_buf4;
    //u8* sheet_buffer=0;
    //sheet_buf4=(u8*)sys_malloc(sheet_mouse->width*sheet_mouse->height);
-   drawmouse(sheet_buffer);
-   sheet_setbuf(sheet_mouse,sheet_buffer);
-	sheet_set_layer(sheets,sheet_mouse,200);
-   sheet_setsheet(sheet_mouse,12,12,100,100);
+   //drawmouse(sheet_buffer);
+   //sheet_setbuf(sheet_mouse,sheet_buffer);
+	//sheet_set_layer(sheets,sheet_mouse,200);
+   //sheet_setsheet(sheet_mouse,12,12,100,100);
+   init_pci();
+	pci_dev_t* pcid=get_pci_bga();
+   vga_screen_width=1024;
+   vga_screnn_height=768;
+   init_bga(pcid);
+
+
+   sheets=sheets_init();
+   set_bkcolor(sheets,rgb_Black);
+   gui_mode=1;
+
+   sheet_mouse = sheet_alloc(sheets);
+	sheet_setsheet(sheet_mouse, 12, 12, 100, 100);
+	u32 *sheet_buf4 = (u32 *)sys_kmalloc(sheet_mouse->width * sheet_mouse->height*4);
+	drawmouse(sheet_buf4);
+	sheet_setbuf(sheet_mouse, sheet_buf4);
+	sheet_set_layer(sheets,sheet_mouse,255);
    
-   {
      
-   }
+  
    
-   //win_test();
+   
+   win_test();
+
+   
    enable_int();
    // for (int i =0; i < memsize; i++)
    // {
@@ -66,6 +86,11 @@ void gui()
    // cmd_window_write_char(100,100,(int)'d',Red,Black);
    // cmd_window_write_string(100,100,"hello123",Red,Blue);
    //cmd_window_draw_mouse(100, 100, Blue, Black);
+   while(1)
+   {
+   //sheets->need_update=TRUE;
+   sheet_refresh_rect(sheets);
+   }
 }
 
 void putPoint(int x, int y, int Color) /* 画点函数 */

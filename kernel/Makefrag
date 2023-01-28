@@ -6,6 +6,8 @@ KERN_SRCFILES :=kernel/kernel.asm	\
 		kernel/gui.c\
 		kernel/vga.c\
 		kernel/bga.c\
+		kernel/fbcon.c\
+		kernel/pci.c\
 		kernel/mouse.c\
 		kernel/window.c\
 		kernel/sheet.c\

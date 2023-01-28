@@ -20,10 +20,6 @@ u32 vga_current_mode = VGA_MODE_80X25_TEXT;
 
 u8 * vga_text_content_backup = NULL;
 
-u16 lfb_resolution_x = 320;
-u16 lfb_resolution_y = 200;
-u16 lfb_resolution_b = 16;
-
 u8 vga_80x25_text[] =
 {
 /* MISC */

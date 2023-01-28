@@ -56,8 +56,14 @@ extern struct hd_info hd_info[1];   //added by mingxuan 2020-10-27
 
 extern struct sheets* sheets;
 extern struct sheet* sheet_mouse;
-extern u8 sheet_buffer[];
-extern u8 bk_buffer[];
+extern u32* sheets_bitmap;
+
 
 #define TTY_FIRST (tty_table)
 #define TTY_END (tty_table + NR_CONSOLES)
+
+//vga mode
+extern u32 vga_current_mode;
+extern u16 vga_screen_width, vga_screnn_height;
+extern u32 vga_screen_line_size, bga_screen_buffer_size;
+extern u32 vga_video_start;
