@@ -16,6 +16,7 @@
 int current_console; // 当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
 int tty_read(TTY *tty, char *buf, int len);
+extern MY_WINDOW* mywin2;
 
 static void init_tty(TTY *tty);
 static void tty_mouse(TTY *tty);
@@ -84,30 +85,7 @@ void in_process(TTY *p_tty, u32 key)
 		}
 	}
 }
-static void tty_mouse_move(TTY *tty)
-{
-	if (sheets == NULL&&sheet_mouse==NULL)
-	{
-		sheets = sheets_init((u8 *)K_PHY2LIN(0xa0000), 320, 200);
-		sheet_mouse = sheet_alloc(sheets);
-		u8 *sheet_buf4 = (u8 *)sys_malloc(sheet_mouse->width * sheet_mouse->height);
-		drawmouse(sheet_buf4);
-		sheet_setbuf(sheet_mouse, sheet_buf4);
-		sheet_setsheet(sheet_mouse, 12, 12, 100, 100);
-	}else if(sheets != NULL&&sheet_mouse==NULL){
-		sheet_mouse = sheet_alloc(sheets);
-		u8 *sheet_buf4 = (u8 *)sys_malloc(sheet_mouse->width * sheet_mouse->height);
-		drawmouse(sheet_buf4);
-		sheet_setbuf(sheet_mouse, sheet_buf4);
-		sheet_setsheet(sheet_mouse, 12, 12, 100, 100);
-	}
-	else
-	{
-		sheet_setsheet(sheet_mouse, 12, 12, tty->mouse_X, tty->mouse_Y);
-	}
-	sheet_refresh_rect(sheets);
-	return;
-}
+
 
 void task_tty()
 {
@@ -130,15 +108,11 @@ void task_tty()
 	// 轮询
 	while (1)
 	{
-		if (gui_mode == 1)
-		{
-			sheet_refresh_rect(sheets);
-		}
 		for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++)
 		{
 			do
 			{
-				//tty_mouse(p_tty); /* tty判断鼠标操作 */
+				// tty_mouse(p_tty); /* tty判断鼠标操作 */
 				//tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
 				//tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
 			} while (p_tty->ibuf_cnt);
@@ -260,6 +234,7 @@ static void tty_dev_write(TTY *tty)
 			}
 		}
 		out_char(tty->console, ch);
+		//win_cmd_put_char(mywin2,ch);
 	}
 }
 

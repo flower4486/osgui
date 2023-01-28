@@ -22,6 +22,7 @@
 #include "assert.h"
 #include "stdio.h"
 #include "sheet.h"
+
 static int initialize_processes();	//added by xw, 18/5/26
 static int initialize_cpus();		//added by xw, 18/6/2
 
@@ -39,7 +40,6 @@ int kernel_main()
 		}
 	}
 	disp_pos = 0;
-
 	kprintf("-----Kernel Initialization Begins-----\n");
 	kernel_initial = 1;	//kernel is in initial state. added by xw, 18/5/31
 	

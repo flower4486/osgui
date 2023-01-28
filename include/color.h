@@ -14,3 +14,18 @@
 #define Light_magenta 0xd
 #define Yellow 0xe
 #define White 0xf
+
+#define rgb_Black 0x000000
+#define rgb_Blue 0x0000ff
+#define rgb_Green 0x00ff00
+#define rgb_Cyan  0x00ffff
+#define rgb_Red 0xff0000
+#define rgb_Brown 0xa52a2a
+#define rgb_Light_Gray 0xb5b5b5
+#define rgb_dark_Gray 0xa9a9a9
+#define rgb_Light_Blue 0xbfefff
+#define rgb_Light_Green 0x7cfc00
+#define rgb_Light_Cyan 0xe0ffff
+#define rgb_Light_Red 0xff333a
+#define rgb_Yellow 0xffff00
+#define rgb_White 0xffffff
