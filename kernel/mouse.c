@@ -55,21 +55,7 @@ void mouse_handler(int irq)
 		}else{
 			dx=1;
 		}
-		//sheet_mouse->x+=6*dx;
-		//sheet_mouse->y+=5*dy;
-		if (gui_mode==1)
-		{
-		 //mouse_move();
-		 sheet_slide(sheets,sheet_mouse,4*dx,3*dy);
-		 if (mouse_bind_sheet!=NULL)
-		 {
-			sheet_slide(sheets,mouse_bind_sheet,4*dx,3*dy);
-		 }
-		 
-		}
-		
-		mouse_in.count = 0;
-	}
+
 
 	
 }
