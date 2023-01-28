@@ -56,7 +56,27 @@ void mouse_handler(int irq)
 			dx=1;
 		}
 
+		<<<<<<< master
+		//sheet_mouse->x+=6*dx;
+		//sheet_mouse->y+=5*dy;
+		if (gui_mode==1)
+		{
+		 //mouse_move();
+		 sheet_slide(sheets,sheet_mouse,4*dx,3*dy);
+		 if (mouse_bind_sheet!=NULL)
+		 {
+			sheet_slide(sheets,mouse_bind_sheet,4*dx,3*dy);
+		 }
+		 
+		}
+		
+// =======2023-01-28 
+// 		sheet_mouse->x+=dx;
+// 		sheet_mouse->y+=dy;
 
+// >>>>>>> master
+		mouse_in.count = 0;
+	}
 	
 }
 
