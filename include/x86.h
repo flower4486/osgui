@@ -94,7 +94,7 @@ outsl(int port, const void *addr, int cnt)
 }
 
 static inline void
-l(int port, u32 data)
+outl(int port, u32 data)
 {
 	asm volatile("outl %0,%w1" : : "a" (data), "d" (port));
 }

@@ -86,5 +86,3 @@ system_call sys_call_table[NR_SYS_CALL] = {
 
 TTY tty_table[NR_CONSOLES];	    // added by mingxuan 2019-5-19
 CONSOLE console_table[NR_CONSOLES]; // added by mingxuan 2019-5-19
-u8 sheet_buffer[320*200];
-u8 bk_buffer[320*200];

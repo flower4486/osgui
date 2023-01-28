@@ -5,11 +5,11 @@ typedef struct _MY_WINDOW MY_WINDOW;
 
 typedef struct _MY_RECT
 {
-	int rx;
+	int rx;//relative
 	int ry;
 	int width;
 	int height;
-	u8	color;
+	u32	color;
 } MY_RECT;
 
 struct _MY_WINDOW
@@ -29,7 +29,7 @@ struct _MY_WINDOW
 	int cmd_font_width;
 	int cmd_font_height;
 
-	u8 cmd_font_color;
+	u32 cmd_font_color;
 };
 
 
@@ -39,5 +39,5 @@ void draw_win_rect(MY_WINDOW* mywin);
 void win_test();
 void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar);
 void win_cmd_put_string(MY_WINDOW* mywin,char* s);
-void drawmouse(u8* buf);
-void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u8 color,u8 bkcolor);
+void drawmouse(u32* buf);
+void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u32 color,u32 bkcolor);

@@ -17,10 +17,11 @@
 static MOUSE_INPUT mouse_in;
 static int mouse_init;
 struct sheet *sheet_mouse;
-void mouse_test()
+struct sheet* mouse_bind_sheet;
+void mouse_move()
 {
+	sheet_setsheet(sheet_mouse, 12, 12, sheet_mouse->x, sheet_mouse->y);
 }
-
 void mouse_handler(int irq)
 {
 	u8 scan_code = inb(0x60);
@@ -54,11 +55,7 @@ void mouse_handler(int irq)
 		}else{
 			dx=1;
 		}
-		sheet_mouse->x+=dx;
-		sheet_mouse->y+=dy;
 
-		mouse_in.count = 0;
-	}
 
 	
 }
