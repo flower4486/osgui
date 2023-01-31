@@ -17,6 +17,7 @@
 
 
 
+
 u16 vga_screen_width, vga_screnn_height;
 u32 vga_screen_line_size, bga_screen_buffer_size;
 u32 vga_video_start;
@@ -32,6 +33,7 @@ static inline u16 _bga_read_reg(u16 cmd) {
 }
 
 static void _bga_set_resolution(u16 width, u16 height) {
+    #ifndef DEBUG
     _bga_write_reg(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_DISABLED);
     _bga_write_reg(VBE_DISPI_INDEX_XRES, width);
     _bga_write_reg(VBE_DISPI_INDEX_YRES, height);
@@ -43,7 +45,7 @@ static void _bga_set_resolution(u16 width, u16 height) {
     _bga_write_reg(VBE_DISPI_INDEX_ENABLE,
                    VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
     _bga_write_reg(VBE_DISPI_INDEX_BANK, 0);
-
+    #endif
     vga_screen_line_size = (u32)width * 4;
 }
 
@@ -54,7 +56,8 @@ static void bga_set_resolution(u32 width, u32 height) {
     bga_screen_buffer_size = vga_screen_line_size * height * 2;
 }
 
-int bga_ioctl(uintptr_t cmd, uintptr_t arg) {
+int bga_ioctl(uintptr_t cmd, uintptr_t arg)
+ {
     u32 y_offset = 0;
     switch (cmd) {
         case BGA_GET_HEIGHT:
@@ -93,21 +96,31 @@ int init_bga(pci_dev_t *dev) {
     if (dev->type != DEVICE_DISPLAY) {
         return -1;
     }
-
+    
     vga_video_start = pci_read_bar(dev, 0) & 0xfffffff0;
     //u32 bga_buf_laddr = K_PHY2LIN(vga_video_start);
-    //bga_set_resolution(1024, 768);
-    bga_set_resolution(vga_screen_width,vga_screnn_height);
+    bga_set_resolution(320, 200);
+    //bga_set_resolution(vga_screen_width,vga_screnn_height);
     //kprintf("bga buf paddr=%p; buf size= %d KB\n", vga_video_start,
     //        bga_screen_buffer_size / 1024);
     //kprintf("bga mapped in kernel cr3=%p\n", read_cr3());
-    for (int k = 0; k < bga_screen_buffer_size; k += 4096) {
-        lin_mapping_phy(vga_video_start + k, 
-                        vga_video_start + k,
-                        p_proc_current->task.pid,
-                        //0,
-                         PG_P | PG_USU | PG_RWW, PG_P | PG_USU | PG_RWW);
+
+    u32 err_temp;
+    for (int k = 0; k < bga_screen_buffer_size; k += num_4K) {
+        err_temp = lin_mapping_phy(
+                       vga_video_start + k, 	    //线性地址					
+					   vga_video_start + k,	    //物理地址
+					   1,		    //进程pid						
+					   PG_P | PG_USU | PG_RWW,  //页目录的属性位（用户权限）			
+					   PG_P | PG_USU | PG_RWW); //页表的属性位（系统权限）				
+		if (err_temp != 0)
+		{
+			disp_color_str("init_page_pte Error:lin_mapping_phy", 0x74);
+			return -1;
+		}
     }
+
+
     //u32 *test = (u32 *)vga_video_start;
     //u32 *test2 = (u32 *)(vga_video_start + bga_screen_buffer_size / 2);
     // for (int i = 0; i <= 1024 * 20; ++i) 
@@ -121,7 +134,7 @@ int init_bga(pci_dev_t *dev) {
     // }
     //  while (1) 
     //  {
-    //     bga_ioctl(BGA_SWAP_BUFFERS, 1);
+     //    bga_ioctl(BGA_SWAP_BUFFERS, 1);
     //     for (volatile int i = 0; i < 0x03ffffff; ++i)
     //         ;
     //     bga_ioctl(BGA_SWAP_BUFFERS, 0);

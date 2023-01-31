@@ -11,7 +11,6 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
-#include "gui.h"
 
 /* 
  * This syscall needs long time to finish, so we can use it 
@@ -40,5 +39,15 @@ void sys_print_E()
  */
 void sys_print_F()
 {
-	gui();
+	int i, j;
+	
+	disp_str("F( ");
+	
+	i = 100;
+	while(--i){
+		j = 1000;
+		while(--j){}
+	}
+	
+	disp_str(") ");
 }

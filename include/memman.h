@@ -7,9 +7,17 @@
 #define KWALL		0x00600000
 #define WALL		0x00800000
 #define UWALL		0x01000000
-#define MEMSTART	0x00400000
 #define MEMEND		0x02000000
+
+#define MEMSTART	0x00400000
+
+// #define KWALL 0x00600000
+// #define WALL 0x01000000
+// #define UWALL 0x02000000
+// #define MEMEND 0x3000000
+
 #define TEST		0x11223344
+#include "type.h"
 struct FREEINFO{
 	u32 addr,size;
 };					

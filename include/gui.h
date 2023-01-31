@@ -13,7 +13,7 @@
 
 
 
-void gui();
+void do_gui();
 void putPoint(int x, int y, int Color);                    // put a point
 void drawline(int row, int start, int end, int color);     // draw a line
 void rectangle(int x1, int y1, int x2, int y2, int Color); /* 画一矩形*/
