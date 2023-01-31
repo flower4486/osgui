@@ -87,7 +87,7 @@ memset(void *v, int c, size_t n)
 	return v;
 }
 void*
-fastset(void *v,int c,size_t n)
+fastset(void *v,u32 c,size_t n)
 {
 	u32* p;
 	int m;

@@ -38,7 +38,7 @@ void win_test()
 	draw_win_rect(mywin2);
 	sheet_slide(sheets,mywin2->sheet,100,100);
 
-	win_cmd_put_string(mywin2,"hello,my gui");
+	//win_cmd_put_string(mywin2,"hello,my gui");
 	//win_cmd_put_char(mywin2,'l');
 	mouse_bind_sheet=mywin2->sheet;
 	//sheets->need_update=TRUE;
@@ -47,7 +47,7 @@ void win_test()
 
 MY_WINDOW* alloc_window()
 {
-	MY_WINDOW* mywin=(MY_WINDOW*)sys_kmalloc(sizeof(MY_WINDOW));
+	MY_WINDOW* mywin=(MY_WINDOW*)K_PHY2LIN(sys_kmalloc(sizeof(MY_WINDOW)));
 	memset((u8*)mywin,0,sizeof(MY_WINDOW));
 
 	mywin->sheet=sheet_alloc(sheets);
@@ -81,9 +81,9 @@ MY_WINDOW* alloc_window()
 
 void init_window(MY_WINDOW* mywin)
 {
-	sheet_setsheet(mywin->sheet,500,300,200,200);
-	 u32* winbuf=(u32*)sys_malloc(mywin->sheet->width*mywin->sheet->height*4);
-	 fastset(winbuf,0,mywin->sheet->height*mywin->sheet->width);
+	sheet_setsheet(mywin->sheet,120,86,20,20);
+	 u32* winbuf=(u32*)(K_PHY2LIN(sys_kmalloc(mywin->sheet->width*mywin->sheet->height*4)));
+	fastset(winbuf,0,mywin->sheet->width*mywin->sheet->height);
 	 sheet_setbuf(mywin->sheet,winbuf);
 	sheet_set_layer(sheets,mywin->sheet,100);
 
@@ -99,10 +99,10 @@ void init_window(MY_WINDOW* mywin)
 	mywin->close_btn_rect.ry=0;
 	mywin->close_btn_rect.color=rgb_Red;
 
-	mywin->cmd_rect.height=mywin->sheet->height-12;
+	mywin->cmd_rect.height=mywin->sheet->height-VGA_CHAR_HEIGHT;
 	mywin->cmd_rect.width=mywin->sheet->width;
 	mywin->cmd_rect.rx=0;
-	mywin->cmd_rect.ry=12;
+	mywin->cmd_rect.ry=VGA_CHAR_HEIGHT;
 	mywin->cmd_rect.color=rgb_Blue;
 
 	mywin->cmd_font_color=rgb_White;
@@ -150,15 +150,21 @@ void draw_win_rect(MY_WINDOW* mywin)
 
 void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)
 {
-	win_sheet_put_char(mywin,mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,rgb_Blue);
 	//vga_write_char(mywin->sheet->x+mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->sheet->y+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,Blue);
-	mywin->cmd_cursor_x+=VGA_CHAR_WIDTH;//+cursor_side;
-	if (mywin->cmd_cursor_x%mywin->sheet->width==0)
+    //+cursor_side;
+	//if (mywin->cmd_cursor_x%mywin->sheet->width==0)
+	if(mywin->cmd_cursor_x!=0&&mywin->cmd_cursor_x>=mywin->sheet->width)
 	{
-		mywin->cmd_cursor_x=0;
-		mywin->cmd_cursor_y+=VGA_CHAR_HEIGHT;
+		if (mywin->cmd_cursor_y<=mywin->cmd_rect.height-2*VGA_CHAR_HEIGHT)
+		{
+			mywin->cmd_cursor_x=0;
+			mywin->cmd_cursor_y+=VGA_CHAR_HEIGHT;
+		}else{
+			mywin->cmd_cursor_x-=VGA_CHAR_WIDTH;
+		}
 	}
-	
+	win_sheet_put_char(mywin,mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,rgb_Blue);
+	mywin->cmd_cursor_x+=VGA_CHAR_WIDTH;
 	return;
 }
 

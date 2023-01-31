@@ -9,7 +9,6 @@
 void	disp_str(char* info);
 void	disp_int(int input);
 void	disp_color_str(char* info, int color);
-void write_u8(char ch);
 void write_char(char ch);    //added by mingxuan 2019-5-19
 
 //added by zcr
@@ -67,8 +66,6 @@ void spurious_irq(int irq);
 /* clock.c */
 void clock_handler(int irq);
 
-
-
 /***************************************************************
 * 以下是系统调用相关函数的声明	
 ****************************************************************/
@@ -91,7 +88,7 @@ void yield();				//added by xw, 18/4/19
 void sleep(int n);			//added by xw, 18/4/19
 void print_E();
 void print_F();
-
+void gui();
 /* syscallc.c */		//edit by visual 2016.4.6
 int   sys_get_ticks();           /* sys_call */
 int   sys_get_pid();				//add by visual 2016.4.6
@@ -122,7 +119,8 @@ void sys_print_F();
 u32 sys_exec(char* path);		//add by visual 2016.5.23
 /*fork.c*/
 int sys_fork();					//add by visual 2016.5.25
-
+// gui.c
+void sys_gui();
 /***************************************************************
 * 以上是系统调用相关函数的声明	
 ****************************************************************/
@@ -142,4 +140,3 @@ void write_page_pte(	u32 TblPhyAddr,u32	AddrLin,u32 PhyAddr,u32 Attribute);
 u32 vmalloc(u32 size);
 int lin_mapping_phy(u32 AddrLin,u32 phy_addr,u32 pid,u32 pde_Attribute,u32 pte_Attribute);//edit by visual 2016.5.19
 void clear_kernel_pagepte_low();		//add by visual 2016.5.12
-

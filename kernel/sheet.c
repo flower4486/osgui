@@ -25,24 +25,27 @@ void sheet_test()
     struct sheet *sheet2 = sheet_alloc(sheets);
     struct sheet *sheet3 = sheet_alloc(sheets);
 
+
     sheet_setsheet(sheet1, 100, 100, 0, 0);
-    u32 *sheet_buf1 = (u32 *)sys_malloc(100 * 100 * 4);
-    fastset(sheet_buf1, rgb_Blue, 100 * 100);
-    sheet_setbuf(sheet1, sheet_buf1);
+    u32 *sheet_buf1 = (u32 *)K_PHY2LIN(sys_kmalloc(100 * 100 * 4));
+    fastset((void*)sheet_buf1, rgb_Blue, 100 * 100);
+    
 
-    sheet_setsheet(sheet2, 100, 100, 100, 0);
-    u32 *sheet_buf2 = (u32 *)sys_malloc(sheet2->width * sheet2->height * 4);
-    fastset(sheet_buf2, rgb_Red, sheet2->width * sheet2->height);
-    sheet_setbuf(sheet2, sheet_buf2);
+    sheet_setbuf(sheet1,(u32*) sheet_buf1);
 
-    sheet_setsheet(sheet3, 100, 100, 200, 0);
-    u32 *sheet_buf3 = (u32 *)sys_malloc(sheet3->width * sheet3->height * 4);
-    fastset(sheet_buf3, rgb_Green, sheet3->width * sheet3->height);
-    sheet_setbuf(sheet3, sheet_buf3);
+    // sheet_setsheet(sheet2, 100, 100, 100, 0);
+    // u32 *sheet_buf2 = (u32 *)sys_malloc(sheet2->width * sheet2->height * 4);
+    // fastset(sheet_buf2, rgb_Red, sheet2->width * sheet2->height);
+    // sheet_setbuf(sheet2, sheet_buf2);
+
+    // sheet_setsheet(sheet3, 100, 100, 200, 0);
+    // u32 *sheet_buf3 = (u32 *)sys_malloc(sheet3->width * sheet3->height * 4);
+    // fastset(sheet_buf3, rgb_Green, sheet3->width * sheet3->height);
+    // sheet_setbuf(sheet3, sheet_buf3);
 
     sheet_set_layer(sheets, sheet1, 3);
-    sheet_set_layer(sheets, sheet2, 5);
-    sheet_set_layer(sheets, sheet3, 8);
+    // sheet_set_layer(sheets, sheet2, 5);
+    // sheet_set_layer(sheets, sheet3, 8);
 
     sheet_refresh_rect(sheets);
 
@@ -57,9 +60,11 @@ void set_bkcolor(struct sheets *sheets, u32 color)
     struct sheet *bksheet = sheet_alloc(sheets);
     sheet_setsheet(bksheet, vga_screen_width, vga_screnn_height, 0, 0);
 
-    u32 *bk_buffer = (u32 *)sys_malloc(vga_screen_width * vga_screnn_height * 4);
+    u32 *bk_buffer = (u32 *)K_PHY2LIN(sys_kmalloc(vga_screen_width * vga_screnn_height * 4));
     sheet_setbuf(bksheet, bk_buffer);
     sheet_set_layer(sheets, bksheet, 0);
+
+    fastset((void*)bksheet->buf,color,bksheet->width*bksheet->height);
     sheets->need_update=TRUE;
    // sheet_refresh_rect(sheets);
     enable_int();
@@ -69,8 +74,8 @@ struct sheets *sheets_init()
 {
     struct sheets *sheets;
     int i;
-    sheets = (struct sheets *)sys_kmalloc(sizeof(struct sheets));
-    sheets_bitmap=(u32*)sys_malloc(1024*768*4);
+    sheets = (struct sheets *)K_PHY2LIN(sys_kmalloc(sizeof(struct sheets)));
+    sheets_bitmap=(u32*)K_PHY2LIN(sys_kmalloc(vga_screen_width*vga_screnn_height*4));
     if (sheets == 0)
     {
         return NULL;
@@ -81,8 +86,8 @@ struct sheets *sheets_init()
         sheets->sheets[i].isuse = SHEET_NOT_USE;
         sheets->sheets[i].id = i;
     }
-    sheets->sheet0 = (struct sheetnode *)sys_malloc(sizeof(struct sheetnode));
-    //memset((u8*)sheets->sheet0,0,sizeof(struct sheetnode));
+    sheets->sheet0 = (struct sheetnode *)K_PHY2LIN(sys_kmalloc(sizeof(struct sheetnode)));
+    memset((u8*)sheets->sheet0,0,sizeof(struct sheetnode));
     sheets->sheet0->nxt=sheets->sheet0->pre=0;
     //sheets->buffer=(u32*)sheets_bitmap;
     return sheets;
@@ -170,7 +175,7 @@ void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
     }
     else
     {
-        newnode = (struct sheetnode *)sys_kmalloc(sizeof(struct sheetnode));
+        newnode = (struct sheetnode *)K_PHY2LIN(sys_kmalloc(sizeof(struct sheetnode)));
         newnode->sheet = sheet;
     }
 
@@ -221,24 +226,34 @@ void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
 void sheet_refresh_rect(struct sheets *sheets)
 {
     struct sheetnode *sheet_cur = sheets->sheet0->nxt;
-    // fastset(sheets->videostart+1024*0,rgb_Blue,1024*30);
+    // fastset(sheets_bitmap,rgb_Blue,1024*768);
     if (sheets->need_update)
     {
         while (sheet_cur != NULL)
         {
-            
+            //fastset(sheet_cur->sheet->buf,rgb_Yellow,vga_screen_width*vga_screnn_height); 
             int offset = sheet_cur->sheet->x + sheet_cur->sheet->y * vga_screen_width;
             for (int i = 0; i < sheet_cur->sheet->height; i++)
-            {
+            {               
+                // for (int j = 0; j < sheet_cur->sheet->width; j++)
+                // {
+                //     //*(u32*)(sheets_bitmap+j+sheet_cur->sheet->x+(i+sheet_cur->sheet->y)*vga_screen_width)=//*(sheet_cur->sheet->buf+j+i*sheet_cur->sheet->width);
+                //     sheets_bitmap[j+sheet_cur->sheet->x+(i+sheet_cur->sheet->y)*vga_screen_width]=
+                //     rgb_Yellow;
+                //     //sheet_cur->sheet->buf[j+i*sheet_cur->sheet->width];
+                // }
+                
                // fastcpy(sheets->videostart + offset, (sheet_cur->sheet->buf + sheet_cur->sheet->width * i), sheet_cur->sheet->width);
                 fastcpy((sheets_bitmap+ offset), (sheet_cur->sheet->buf + sheet_cur->sheet->width * i), sheet_cur->sheet->width);
                // fastcpy((sheets->videostart + offset),sheets->buffer+offset,sheet_cur->sheet->width);
-              // fastcpy((sheets_bitmap+ offset), (sheet_cur->sheet->buf + vga_screnn_height * i), vga_screnn_height);
+               //fastcpy((sheets_bitmap+ offset), (sheet_cur->sheet->buf + vga_screnn_height * i), vga_screnn_height); 
+                          
                 offset += vga_screen_width;
             }
             
             sheet_cur = sheet_cur->nxt;
         }
+        //fastset(sheets_bitmap,rgb_Yellow,vga_screen_width*vga_screnn_height); 
         sheet_write_graphic_mem();
         sheets->need_update = FALSE;
     }
@@ -246,13 +261,18 @@ void sheet_refresh_rect(struct sheets *sheets)
 
 void sheet_write_graphic_mem()
 {
-   // fastset(sheets_bitmap,rgb_Yellow,vga_screen_width*vga_screnn_height);
+    //fastset(sheets_bitmap,rgb_Yellow,vga_screen_width*vga_screnn_height);
     // int offset=0;
-    // for (int i = 0; i < vga_screnn_height; i+=10)
-    // {
-     fastcpy(sheets->videostart,sheets_bitmap,vga_screen_width*vga_screnn_height);
+     for (int i = 0; i < vga_screnn_height*vga_screen_width; i++)
+     {
+     //fastcpy(sheets->videostart,sheets_bitmap,vga_screen_width*vga_screnn_height);
     // offset+=vga_screen_width*10;
-    // }    
+    *(u32*)(sheets->videostart+i)=
+    *((u32*)(sheets_bitmap+i));
+   // sheets->videostart[i]=
+    //rgb_Blue;
+    //*(sheets_bitmap+i);
+     }    
 }
 
 void sheet_free(struct sheet *sheet, struct sheets *sheets)
@@ -278,9 +298,25 @@ void sheet_slide(struct sheets *sheets, struct sheet *sheet, int mx, int my)
 {
     sheet->x += mx;
     sheet->y += my;
+    if (sheet->x>=vga_screen_width-sheet->width)
+    {
+        sheet->x=vga_screen_width-sheet->width;
+    }else if (sheet->x<=0)
+    {
+        sheet->x=0;
+    }
+    
+    if (sheet->y>=vga_screnn_height-sheet->height)
+    {
+       sheet->y=vga_screnn_height-sheet->height;
+    }else if (sheet->y<=0)
+    {
+        sheet->y=0;
+    }    
     if (sheet->isuse)
     {
         sheets->need_update=TRUE;
     }
     return;
 }
+

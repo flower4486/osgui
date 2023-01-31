@@ -21,6 +21,7 @@
 #include "fs.h"
 #include "fat32.h" //added by mingxuan 2019-5-17
 #include "vfs.h"   //added by mingxuan 2019-5-17
+//#include "gui.h"
 
 int kernel_initial;
 int ticks;
@@ -48,7 +49,7 @@ PROCESS proc_table[NR_PCBS]; // edit by visual 2016.4.5
 TASK task_table[NR_TASKS] = {
     {hd_service, STACK_SIZE_TASK, "hd_service"},
     {task_tty, STACK_SIZE_TASK, "task_tty"},
-   // {gui,STACK_SIZE_TASK,"gui"}
+    //{gui,STACK_SIZE_TASK,"gui"}
     }; // added by xw, 18/8/27
 
 irq_handler irq_table[NR_IRQ];
@@ -81,7 +82,8 @@ system_call sys_call_table[NR_SYS_CALL] = {
     sys_delete,	    // added by mingxuan 2019-5-17
     sys_opendir,    // added by mingxuan 2019-5-17
     sys_createdir,  // added by mingxuan 2019-5-17
-    sys_deletedir   // added by mingxuan 2019-5-17
+    sys_deletedir,   // added by mingxuan 2019-5-17
+    sys_gui
 };
 
 TTY tty_table[NR_CONSOLES];	    // added by mingxuan 2019-5-19

@@ -22,7 +22,8 @@
 #include "assert.h"
 #include "stdio.h"
 #include "sheet.h"
-
+#include "pci.h"
+#include "bga.h"
 static int initialize_processes();	//added by xw, 18/5/26
 static int initialize_cpus();		//added by xw, 18/6/2
 
@@ -81,7 +82,11 @@ int kernel_main()
 	/* enable interrupt, we should read information of some devices by interrupt.
 	 * Note that you must have initialized all devices ready before you enable
 	 * interrupt. added by xw
+	 * 
 	 */
+	   init_pci();
+	pci_dev_t* pcid=get_pci_bga();
+   init_bga(pcid);
 	enable_int();
 	
     /***********************************************************************

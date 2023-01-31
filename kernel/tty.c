@@ -13,6 +13,7 @@
 #include "sheet.h"
 #include "window.h"
 #include "vga.h"
+#include "bga.h"
 int current_console; // 当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
 int tty_read(TTY *tty, char *buf, int len);
@@ -86,9 +87,12 @@ void in_process(TTY *p_tty, u32 key)
 	}
 }
 
+#define TTY_FIRST (tty_table)
+#define TTY_END (tty_table + NR_CONSOLES)
 
 void task_tty()
 {
+	//bga_ioctl(BGA_DISABLE,0);
 	TTY *p_tty;
 	for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++)
 	{
@@ -96,25 +100,33 @@ void task_tty()
 	}
 	p_tty = tty_table;
 
+	sys_gui();
+
+	//while (1);
+	//win_cmd_put_string(mywin2,"hello,my gui");
+
 	select_console(0);
 
-	// 设置第一个tty光标位置，第一个tty需要特殊处理
+	//设置第一个tty光标位置，第一个tty需要特殊处理
 	disable_int();
 	outb(CRTC_ADDR_REG, CURSOR_H);
 	outb(CRTC_DATA_REG, ((disp_pos / 2) >> 8) & 0xFF);
 	outb(CRTC_ADDR_REG, CURSOR_L);
 	outb(CRTC_DATA_REG, (disp_pos / 2) & 0xFF);
 	enable_int();
-	// 轮询
+
+	//轮询
 	while (1)
 	{
 		for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++)
 		{
 			do
 			{
-				// tty_mouse(p_tty); /* tty判断鼠标操作 */
-				//tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
-				//tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
+				sheet_refresh_rect(sheets);
+				tty_mouse(p_tty); /* tty判断鼠标操作 */
+				tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
+				tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
+
 			} while (p_tty->ibuf_cnt);
 		}
 	}
@@ -144,7 +156,7 @@ static void tty_mouse(TTY *tty)
 		{
 
 			if (tty->mouse_Y > MOUSE_UPDOWN_BOUND)
-			{ // 按住鼠标左键向上滚动
+			{ //按住鼠标左键向上滚动
 				if (tty->console->current_line < 43)
 				{
 					disable_int();
@@ -158,7 +170,7 @@ static void tty_mouse(TTY *tty)
 				}
 			}
 			else if (tty->mouse_Y < -MOUSE_UPDOWN_BOUND)
-			{ // 按住鼠标左键向下滚动
+			{ //按住鼠标左键向下滚动
 				if (tty->console->current_line > 0)
 				{
 					disable_int();
@@ -174,7 +186,7 @@ static void tty_mouse(TTY *tty)
 		}
 
 		if (tty->mouse_mid_button)
-		{ // 点击中键复原
+		{ //点击中键复原
 			disable_int();
 			tty->console->current_line = 0;
 			outb(CRTC_ADDR_REG, START_ADDR_H);
@@ -197,7 +209,7 @@ static void tty_dev_read(TTY *tty)
 
 static void tty_dev_write(TTY *tty)
 {
-
+	
 	if (tty->ibuf_cnt)
 	{
 		char ch = *(tty->ibuf_tail);
@@ -233,8 +245,8 @@ static void tty_dev_write(TTY *tty)
 				}
 			}
 		}
-		out_char(tty->console, ch);
-		//win_cmd_put_char(mywin2,ch);
+		//out_char(tty->console, ch);
+		win_cmd_put_char(mywin2,ch);
 	}
 }
 
@@ -260,7 +272,9 @@ static void put_key(TTY *tty, u32 key)
 void tty_write(TTY *tty, char *buf, int len)
 {
 	while (--len >= 0)
+
 		out_char(tty->console, *buf++);
+		//win_cmd_put_char(mywin2,*buf++);
 }
 
 /*****************************************************************************

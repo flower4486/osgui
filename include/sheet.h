@@ -7,20 +7,21 @@
 #define SHEET_NOT_USE 0
 struct sheet
 {
-    //u32 buf[1024*768];
-    u32* buf;
-    int width,height,x,y,isuse,id;
     
+    
+    int width,height,x,y,isuse,id;
+    u32* buf;
 };
 struct sheets
 {
     u32 *videostart;
     //u32* buffer;
     //int width,height,top;
-    struct sheetnode* sheet0;
+    
     struct sheet sheets[MAX_SHEETS];
     int need_update;
     //u32* buffer;
+    struct sheetnode* sheet0;
 };
 struct sheetnode
 {
