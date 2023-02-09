@@ -74,7 +74,7 @@ void do_gui()
   
    
    //sheet_test();
-   win_test();
+   //win_test();
    // win_cmd_put_string(mywin,"dsfdf");
    
    

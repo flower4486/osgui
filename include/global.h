@@ -60,7 +60,6 @@ extern u32* sheets_bitmap;
 
 
 
-
 //vga mode
 extern u32 vga_current_mode;
 extern u16 vga_screen_width, vga_screnn_height;

@@ -32,6 +32,7 @@ struct _MY_WINDOW
 	u32 cmd_font_color;
 };
 
+extern  MY_WINDOW*  current_window;
 
 MY_WINDOW* alloc_window();
 //void init_window(MY_WINDOW* mywin);
