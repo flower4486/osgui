@@ -45,7 +45,8 @@ typedef struct s_tty
 	int mouse_mid_button;
 	int mouse_X;
 	int mouse_Y;
-	// struct _MY_WINDOW window; //new
+	
+	struct _MY_WINDOW *window; //new
 	struct s_console *	console;
 }TTY;
 

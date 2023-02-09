@@ -26,64 +26,7 @@ MY_WINDOW * mywin_list_kbd_input = NULL;
 MY_WINDOW * mywin2;
 MY_WINDOW * mywin;
 
-void win_test()
-{
-	struct sheets* s=sheets;
-	// MY_WINDOW* mywin=alloc_window();
-	mywin=alloc_window();
-	init_window(mywin);
-	draw_win_rect(mywin);
-	// sheet_slide(sheets,mywin->sheet,100,100);
-	//MY_WINDOW* 
-	mywin2=alloc_window();
-	init_window(mywin2);
-	draw_win_rect(mywin2);
-	sheet_slide(sheets,mywin2->sheet,100,100);
-
-	win_cmd_put_string(mywin2,"hello,my gui");
-	win_cmd_put_string(mywin,"llll");
-	// win_cmd_put_char(mywin,'\n');
-	// win_cmd_put_char(mywin,'d');
-	mouse_bind_sheet=mywin2->sheet;
-	//sheets->need_update=TRUE;
-   //sheet_refresh_rect(sheets);
-}
-
-MY_WINDOW* alloc_window()
-{
-	MY_WINDOW* mywin=(MY_WINDOW*)K_PHY2LIN(sys_kmalloc(sizeof(MY_WINDOW)));
-	memset((u8*)mywin,0,sizeof(MY_WINDOW));
-
-	mywin->sheet=sheet_alloc(sheets);
- 
-	if(mywin_list_header == NULL)
-	{
-		mywin_list_header = mywin;
-		mywin_list_end = mywin;
-	}
-	else
-	{
-		MY_WINDOW * tmpwin = mywin_list_header;
-		for(;;)
-		{
-			if(tmpwin->nxt == NULL)
-			{
-				tmpwin->nxt = mywin;
-				mywin->pre = tmpwin;
-				break;
-			}
-			else
-			{
-				tmpwin = tmpwin->nxt;
-			}
-		}
-		mywin_list_end = mywin;
-	}
-
-	return mywin;
-}
-
-void init_window(MY_WINDOW* mywin)
+static void init_window(MY_WINDOW* mywin)
 {
 	sheet_setsheet(mywin->sheet,120,86,20,20);
 	 u32* winbuf=(u32*)(K_PHY2LIN(sys_kmalloc(mywin->sheet->width*mywin->sheet->height*4)));
@@ -118,7 +61,7 @@ void init_window(MY_WINDOW* mywin)
 	return;
 }
 
-void draw_win_rect(MY_WINDOW* mywin)
+static void draw_win_rect(MY_WINDOW* mywin)
 {
 	struct sheets* s=sheets;
 	u32* buf=mywin->sheet->buf;
@@ -150,6 +93,56 @@ void draw_win_rect(MY_WINDOW* mywin)
 	}
 
 	sheets->need_update=TRUE;
+}
+
+void win_test()
+{
+	struct sheets* s=sheets;
+	mywin=alloc_window();
+	mywin2=alloc_window();
+	
+	sheet_slide(sheets,mywin2->sheet,100,100);
+
+	win_cmd_put_string(mywin2,"hello,my gui");
+	win_cmd_put_string(mywin,"llll");
+
+	mouse_bind_sheet=mywin2->sheet;
+
+}
+
+MY_WINDOW* alloc_window()
+{
+	MY_WINDOW* mywin=(MY_WINDOW*)K_PHY2LIN(sys_kmalloc(sizeof(MY_WINDOW)));
+	memset((u8*)mywin,0,sizeof(MY_WINDOW));
+
+	mywin->sheet=sheet_alloc(sheets);
+ 
+	if(mywin_list_header == NULL)
+	{
+		mywin_list_header = mywin;
+		mywin_list_end = mywin;
+	}
+	else
+	{
+		MY_WINDOW * tmpwin = mywin_list_header;
+		for(;;)
+		{
+			if(tmpwin->nxt == NULL)
+			{
+				tmpwin->nxt = mywin;
+				mywin->pre = tmpwin;
+				break;
+			}
+			else
+			{
+				tmpwin = tmpwin->nxt;
+			}
+		}
+		mywin_list_end = mywin;
+	}
+	init_window(mywin);
+	draw_win_rect(mywin);
+	return mywin;
 }
 
 void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)

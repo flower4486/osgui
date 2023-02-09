@@ -34,8 +34,8 @@ struct _MY_WINDOW
 
 
 MY_WINDOW* alloc_window();
-void init_window(MY_WINDOW* mywin);
-void draw_win_rect(MY_WINDOW* mywin);
+//void init_window(MY_WINDOW* mywin);
+//void draw_win_rect(MY_WINDOW* mywin);
 void win_test();
 void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar);
 void win_cmd_put_string(MY_WINDOW* mywin,char* s);
