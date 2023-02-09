@@ -18,7 +18,8 @@ int current_console; // 当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
 int tty_read(TTY *tty, char *buf, int len);
 extern MY_WINDOW* mywin2;
-
+extern MY_WINDOW* mywin;
+int current_window;
 static void init_tty(TTY *tty);
 static void tty_mouse(TTY *tty);
 static void tty_dev_read(TTY *tty);
@@ -28,7 +29,7 @@ static void put_key(TTY *tty, u32 key);
 void in_process(TTY *p_tty, u32 key)
 {
 	int real_line = p_tty->console->orig / SCR_WIDTH;
-
+	// current_window = 0;
 	if (!(key & FLAG_EXT))
 	{
 		put_key(p_tty, key);
@@ -41,6 +42,7 @@ void in_process(TTY *p_tty, u32 key)
 		case ENTER:
 			put_key(p_tty, '\n');
 			p_tty->status = p_tty->status & 3; //&3'b011
+			// current_window=1;
 			break;
 		case BACKSPACE:
 			put_key(p_tty, '\b');
@@ -70,8 +72,19 @@ void in_process(TTY *p_tty, u32 key)
 			}
 			break;
 		case F1:
+			// "llll"
+			disable_int();
+			current_window = 1;
+			enable_int();
+			break;	
 		case F2:
+			//"hello,my gui"
+			disable_int();
+			current_window = 2;	
+			enable_int();
+			break;
 		case F3:
+
 		case F4:
 		case F5:
 		case F6:
@@ -99,12 +112,15 @@ void task_tty()
 		init_tty(p_tty);
 	}
 	p_tty = tty_table;
-
-	sys_gui();
+	// win_cmd_put_string(mywin,"dddddddd");
+	// win_cmd_put_string(mywin,"dsfdf");,         不能调用
+	// win_cmd_put_string(mywin2,"dsfdf");
+	sys_gui(p_tty);
 
 	//while (1);
 	//win_cmd_put_string(mywin2,"hello,my gui");
-
+	// win_cmd_put_string(mywin,"dsfdf");
+	// while(1);
 	select_console(0);
 
 	//设置第一个tty光标位置，第一个tty需要特殊处理
@@ -123,6 +139,8 @@ void task_tty()
 			do
 			{
 				sheet_refresh_rect(sheets);
+				// sheet_change_output(sheets);
+
 				tty_mouse(p_tty); /* tty判断鼠标操作 */
 				tty_dev_read(p_tty);  /* 从键盘输入缓冲区读到这个tty自己的缓冲区 */
 				tty_dev_write(p_tty); /* 把tty缓存区的数据写到这个tty占有的显存 */
@@ -245,8 +263,23 @@ static void tty_dev_write(TTY *tty)
 				}
 			}
 		}
-		//out_char(tty->console, ch);
-		win_cmd_put_char(mywin2,ch);
+		// //out_char(tty->console, ch);
+		// if(current_window==1){
+		// 	win_cmd_put_char(mywin, ch);
+		// }
+		// else if(current_window==2){
+		// 	win_cmd_put_char(mywin2, ch);
+		// }
+		
+		if(current_window==2){
+			win_cmd_put_char(mywin2, ch);
+		}
+		if(current_window==1){
+			win_cmd_put_char(mywin, ch);
+		}
+		// current_window=-1;
+		// win_cmd_put_string(mywin,"dsfsdfsdfsdf");  无效
+		// win_cmd_put_char(mywin2,ch); 有效
 	}
 }
 
@@ -262,6 +295,11 @@ static void put_key(TTY *tty, u32 key)
 		tty->ibuf_read_cnt++;
 	}
 }
+
+
+
+
+
 
 /*****************************************************************************
  *                                tty_write

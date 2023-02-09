@@ -23,23 +23,27 @@ extern struct sheet* mouse_bind_sheet;
 MY_WINDOW * mywin_list_header = NULL;
 MY_WINDOW * mywin_list_end = NULL;
 MY_WINDOW * mywin_list_kbd_input = NULL;
-MY_WINDOW* mywin2;
+MY_WINDOW * mywin2;
+MY_WINDOW * mywin;
 
 void win_test()
 {
 	struct sheets* s=sheets;
-	MY_WINDOW* mywin=alloc_window();
+	// MY_WINDOW* mywin=alloc_window();
+	mywin=alloc_window();
 	init_window(mywin);
 	draw_win_rect(mywin);
-
+	// sheet_slide(sheets,mywin->sheet,100,100);
 	//MY_WINDOW* 
 	mywin2=alloc_window();
 	init_window(mywin2);
 	draw_win_rect(mywin2);
 	sheet_slide(sheets,mywin2->sheet,100,100);
 
-	//win_cmd_put_string(mywin2,"hello,my gui");
-	//win_cmd_put_char(mywin2,'l');
+	win_cmd_put_string(mywin2,"hello,my gui");
+	win_cmd_put_string(mywin,"llll");
+	// win_cmd_put_char(mywin,'\n');
+	// win_cmd_put_char(mywin,'d');
 	mouse_bind_sheet=mywin2->sheet;
 	//sheets->need_update=TRUE;
    //sheet_refresh_rect(sheets);
@@ -86,7 +90,7 @@ void init_window(MY_WINDOW* mywin)
 	fastset(winbuf,0,mywin->sheet->width*mywin->sheet->height);
 	 sheet_setbuf(mywin->sheet,winbuf);
 	sheet_set_layer(sheets,mywin->sheet,100);
-
+	// 画窗口
 	mywin->title_rect.height=VGA_CHAR_HEIGHT;
 	mywin->title_rect.width=0.9*mywin->sheet->width;
 	mywin->title_rect.rx=0;

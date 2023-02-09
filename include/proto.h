@@ -120,6 +120,7 @@ u32 sys_exec(char* path);		//add by visual 2016.5.23
 /*fork.c*/
 int sys_fork();					//add by visual 2016.5.25
 // gui.c
+// void sys_gui(TTY *p_tty);
 void sys_gui();
 /***************************************************************
 * 以上是系统调用相关函数的声明	
