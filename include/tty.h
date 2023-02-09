@@ -10,7 +10,7 @@
 /**********************************************************
 *	tty.h       //added by mingxuan 2019-5-17
 ***********************************************************/
-
+// #include "window.h"
 #ifndef	_ORANGES_TTY_H_
 #define	_ORANGES_TTY_H_
 
@@ -45,7 +45,7 @@ typedef struct s_tty
 	int mouse_mid_button;
 	int mouse_X;
 	int mouse_Y;
-
+	// struct _MY_WINDOW window; //new
 	struct s_console *	console;
 }TTY;
 

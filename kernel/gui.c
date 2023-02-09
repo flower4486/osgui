@@ -19,7 +19,7 @@
 #include "mouse.h"
 #include "pci.h"
 #include "bga.h"
-
+#
 
 void sys_gui(){
 	do_gui();
@@ -50,13 +50,13 @@ void do_gui()
    //sheet_setbuf(sheet_mouse,sheet_buffer);
 	//sheet_set_layer(sheets,sheet_mouse,200);
    //sheet_setsheet(sheet_mouse,12,12,100,100);
-   disable_int();
+   // disable_int();
    // init_pci();
 	// pci_dev_t* pcid=get_pci_bga();
    // vga_screen_width=1024;
    // vga_screnn_height=768;
    // init_bga(pcid);
-   enable_int();
+   // enable_int();
 
 
    sheets=sheets_init();
@@ -75,7 +75,7 @@ void do_gui()
    
    //sheet_test();
    win_test();
-
+   // win_cmd_put_string(mywin,"dsfdf");
    
    
    // for (int i =0; i < memsize; i++)
@@ -95,10 +95,10 @@ void do_gui()
    // cmd_window_write_string(100,100,"hello123",Red,Blue);
    //cmd_window_draw_mouse(100, 100, Blue, Black);
   // while(1)
-   {
-   //sheets->need_update=TRUE;
+   // {
+   // //sheets->need_update=TRUE;
   
-   }
+   // }
 }
 
 void putPoint(int x, int y, int Color) /* 画点函数 */

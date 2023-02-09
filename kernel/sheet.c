@@ -265,16 +265,19 @@ void sheet_write_graphic_mem()
     // int offset=0;
      for (int i = 0; i < vga_screnn_height*vga_screen_width; i++)
      {
-     //fastcpy(sheets->videostart,sheets_bitmap,vga_screen_width*vga_screnn_height);
-    // offset+=vga_screen_width*10;
-    *(u32*)(sheets->videostart+i)=
-    *((u32*)(sheets_bitmap+i));
-   // sheets->videostart[i]=
-    //rgb_Blue;
-    //*(sheets_bitmap+i);
+        //fastcpy(sheets->videostart,sheets_bitmap,vga_screen_width*vga_screnn_height);
+        // offset+=vga_screen_width*10;
+        *(u32*)(sheets->videostart+i)=
+        *((u32*)(sheets_bitmap+i));
+        // sheets->videostart[i]=
+        //rgb_Blue;
+        //*(sheets_bitmap+i);
      }    
 }
-
+void sheet_change_output(struct sheets *sheets)
+{
+    
+}
 void sheet_free(struct sheet *sheet, struct sheets *sheets)
 {
     if (sheet->isuse)

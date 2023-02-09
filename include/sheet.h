@@ -39,6 +39,7 @@ void sheet_free(struct sheet *sheet,struct sheets* sheets);
 void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer);
 void sheet_test();
 void sheet_refresh_rect(struct sheets *sheets);
+void sheet_change_output(struct sheets *sheets);
 void sheet_setbuf(struct sheet* sheet,u32* buf);
 void sheet_slide(struct sheets* sheets,struct sheet* sheet,int mx,int my);
 void set_bkcolor(struct sheets* sheets,u32 color);
