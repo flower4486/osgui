@@ -17,14 +17,21 @@
 int current_console; // 当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
 int tty_read(TTY *tty, char *buf, int len);
-extern MY_WINDOW* mywin2;
-extern MY_WINDOW* mywin;
-int current_window=1;
+MY_WINDOW* current_window;
 static void init_tty(TTY *tty);
 static void tty_mouse(TTY *tty);
 static void tty_dev_read(TTY *tty);
 static void tty_dev_write(TTY *tty);
 static void put_key(TTY *tty, u32 key);
+static int win_num=0;
+
+//list of windows
+extern MY_WINDOW * mywin_list_header ;
+extern MY_WINDOW * mywin_list_end ;
+extern MY_WINDOW * mywin_list_kbd_input ;
+//mouse.c
+extern struct sheet* mouse_bind_sheet;
+
 
 void in_process(TTY *p_tty, u32 key)
 {
@@ -72,13 +79,18 @@ void in_process(TTY *p_tty, u32 key)
 			}
 			break;
 		case F1:
-			current_window = 1;
-			break;	
-		case F2:
-			current_window = 2;	
+			disable_int();
+			current_window=alloc_window();
+			win_num++;
+			enable_int();
 			break;
+		case F2:
+		current_window=(current_window->nxt!=NULL)?current_window->nxt:mywin_list_header;
+		break;
 		case F3:
-
+		mouse_bind_sheet=(mouse_bind_sheet==NULL)?current_window->sheet:
+												  NULL;
+		break;
 		case F4:
 		case F5:
 		case F6:
@@ -107,7 +119,7 @@ void task_tty()
 	}
 	p_tty = tty_table;
 
-	sys_gui(p_tty);
+	sys_gui();
 
 	select_console(0);
 
@@ -250,12 +262,7 @@ static void tty_dev_write(TTY *tty)
 			}
 		}
 
-		if(current_window==2){
-			win_cmd_put_char(mywin2, ch);
-		}
-		if(current_window==1){
-			win_cmd_put_char(mywin, ch);
-		}
+		win_cmd_put_char(current_window,ch);
 	}
 }
 
