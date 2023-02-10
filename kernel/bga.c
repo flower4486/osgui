@@ -49,7 +49,8 @@ static void _bga_set_resolution(u16 width, u16 height) {
     vga_screen_line_size = (u32)width * 4;
 }
 
-static void bga_set_resolution(u32 width, u32 height) {
+void bga_set_resolution(u32 width, u32 height) 
+{
     _bga_set_resolution(width, height);
     vga_screen_width = width;
     vga_screnn_height = height;
@@ -99,14 +100,13 @@ int init_bga(pci_dev_t *dev) {
     
     vga_video_start = pci_read_bar(dev, 0) & 0xfffffff0;
     //u32 bga_buf_laddr = K_PHY2LIN(vga_video_start);
-    bga_set_resolution(320, 200);
     //bga_set_resolution(vga_screen_width,vga_screnn_height);
     //kprintf("bga buf paddr=%p; buf size= %d KB\n", vga_video_start,
     //        bga_screen_buffer_size / 1024);
     //kprintf("bga mapped in kernel cr3=%p\n", read_cr3());
 
     u32 err_temp;
-    for (int k = 0; k < bga_screen_buffer_size; k += num_4K) {
+    for (int k = 0; k < 1024*768; k += num_4K) {
         err_temp = lin_mapping_phy(
                        vga_video_start + k, 	    //线性地址					
 					   vga_video_start + k,	    //物理地址
@@ -119,27 +119,5 @@ int init_bga(pci_dev_t *dev) {
 			return -1;
 		}
     }
-
-
-    //u32 *test = (u32 *)vga_video_start;
-    //u32 *test2 = (u32 *)(vga_video_start + bga_screen_buffer_size / 2);
-    // for (int i = 0; i <= 1024 * 20; ++i) 
-    // {
-    // test[i] = 0x00ff12;
-    // }
-    
-    // for (int i = 1024 * 20; i <= 1024 * 768; ++i)
-    // {
-    // test[i] = 0x0000ff;
-    // }
-    //  while (1) 
-    //  {
-     //    bga_ioctl(BGA_SWAP_BUFFERS, 1);
-    //     for (volatile int i = 0; i < 0x03ffffff; ++i)
-    //         ;
-    //     bga_ioctl(BGA_SWAP_BUFFERS, 0);
-    //     for (volatile int i = 0; i < 0x03ffffff; ++i)
-    //         ;
-    // }
     return 0;
 }

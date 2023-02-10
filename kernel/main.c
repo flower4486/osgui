@@ -84,9 +84,9 @@ int kernel_main()
 	 * interrupt. added by xw
 	 * 
 	 */
-	   init_pci();
+	init_pci();
 	pci_dev_t* pcid=get_pci_bga();
-   init_bga(pcid);
+    init_bga(pcid);
 	enable_int();
 	
     /***********************************************************************

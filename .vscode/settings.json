@@ -1,10 +1,11 @@
 {
     "files.associations": {
         "*.md": "markdown",
-        "*.h":"c",
-        "*.c":"c",
-        ".asm":"nasm",
-        "Makefrag":"makefile"
+        "*.h": "c",
+        "*.c": "c",
+        ".asm": "nasm",
+        "Makefrag": "makefile",
+        "atomic": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
 }

@@ -19,18 +19,30 @@
 #include "mouse.h"
 #include "pci.h"
 #include "bga.h"
-#
+void do_set_screen(int width,int height)
+{
+   gui_mode=1;
+   bga_set_resolution(width, height);
+   return;
+}
+void sys_set_screen(void *uesp)
+{
+    return do_set_screen(get_arg(uesp, 1), get_arg(uesp, 2));
+}
 
-void sys_gui(){
+void sys_gui()
+{
 	do_gui();
    return;
 }
 void do_gui()
 {
-   // vga_write_regs(vga_320x200x256);
+   //bga_ioctl(BGA_DISABLE,0);
+  // vga_write_regs(vga_320x200x256);
+   // vga_write_regs(vga_80x25_text);
  //  open gui mode
    //vga_write_regs(vga_80x25_text);
-   
+   //memset((void*)K_PHY2LIN(0xa0000),Red,0xffff);
    //int p;
    //u8* p=(u8 *)memstart;
    //if(sheets==NULL)
@@ -57,11 +69,11 @@ void do_gui()
    // vga_screnn_height=768;
    // init_bga(pcid);
    // enable_int();
-
+   
 
    sheets=sheets_init();
    set_bkcolor(sheets,rgb_Black);
-   gui_mode=1;
+   
 
    sheet_mouse = sheet_alloc(sheets);
 	sheet_setsheet(sheet_mouse, 12, 12, 100, 100);

@@ -559,26 +559,6 @@ int vga_update_screen(u8 * buffer, u32 buffer_size)
 		memcpy(video_memory, buffer, buffer_size);
 		return 0;
 		break;
-	case VGA_MODE_640X480X16:
-		video_memory = (u8 *)vga_get_fb_seg();
-		u32 tmp_size = buffer_size, plane_size = (640 * 480) / 8, i;
-		for(i=0; i < 4 ;i++)
-		{
-			vga_set_plane(i);
-			if(tmp_size <= plane_size)
-			{
-				memcpy(video_memory, buffer, tmp_size);
-				break;
-			}
-			else
-			{
-				memcpy(video_memory, buffer, plane_size);
-				tmp_size -= plane_size;
-				buffer += plane_size;
-			}
-		}
-		return 0;
-		break;
 	default:
 		break;
 	}

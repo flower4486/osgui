@@ -33,3 +33,5 @@ int bga_ioctl(uintptr_t cmd, uintptr_t arg);
 #define VBE_DISPI_DISABLED 0x00
 #define VBE_DISPI_ENABLED 0x01
 #define VBE_DISPI_LFB_ENABLED 0x40
+
+void bga_set_resolution(u32 width, u32 height);

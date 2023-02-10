@@ -12,7 +12,7 @@ int main(){
    // while (1)
     {
 
-       //gui();
+       //set_screen(320,200);
     }
     
 
