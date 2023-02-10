@@ -89,6 +89,7 @@ void sleep(int n);			//added by xw, 18/4/19
 void print_E();
 void print_F();
 void gui();
+void set_screen(int width,int height);
 /* syscallc.c */		//edit by visual 2016.4.6
 int   sys_get_ticks();           /* sys_call */
 int   sys_get_pid();				//add by visual 2016.4.6
@@ -120,8 +121,8 @@ u32 sys_exec(char* path);		//add by visual 2016.5.23
 /*fork.c*/
 int sys_fork();					//add by visual 2016.5.25
 // gui.c
-// void sys_gui(TTY *p_tty);
 void sys_gui();
+void sys_set_screen(void *uesp);
 /***************************************************************
 * 以上是系统调用相关函数的声明	
 ****************************************************************/

@@ -143,6 +143,8 @@ MY_WINDOW* alloc_window()
 	return mywin;
 }
 
+
+
 void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)
 {
 	if(mywin->cmd_cursor_x!=0&&mywin->cmd_cursor_x>=mywin->sheet->width)
