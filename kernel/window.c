@@ -58,7 +58,9 @@ static void init_window(MY_WINDOW* mywin)
 	mywin->cmd_font_width=VGA_CHAR_WIDTH;
 	return;
 }
-
+/*
+初始化一下buf数组，把这个窗口基本的形状先画出来，注意最后要将sheets的needupdate转换为TRUE
+*/
 static void draw_win_rect(MY_WINDOW* mywin)
 {
 	struct sheets* s=sheets;
@@ -108,6 +110,12 @@ void win_test()
 
 }
 
+/*
+- 申请一个有空间的window，返回他的指针。
+- 申请这个window的图层
+- 将这个window指针加入到window双链表之中
+- 为了方便直接设置该窗口window的属性（大小位置）init_window 与 画 draw_win_rect(mywin)
+*/
 MY_WINDOW* alloc_window()
 {
 	MY_WINDOW* mywin=(MY_WINDOW*)K_PHY2LIN(sys_kmalloc(sizeof(MY_WINDOW)));
