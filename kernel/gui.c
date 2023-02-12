@@ -30,21 +30,15 @@ void sys_set_screen(void *uesp)
     return do_set_screen(get_arg(uesp, 1), get_arg(uesp, 2));
 }
 
+
 void sys_gui()
 {
-	do_gui();
-   return;
-}
-void do_gui()
-{
-   //bga_ioctl(BGA_DISABLE,0);
-  // vga_write_regs(vga_320x200x256);
-   // vga_write_regs(vga_80x25_text);
+
  //  open gui mode
    //vga_write_regs(vga_80x25_text);
    //memset((void*)K_PHY2LIN(0xa0000),Red,0xffff);
    //int p;
-   //u8* p=(u8 *)memstart;
+   //u8* p=(u8 *)vga_video_start;
    //if(sheets==NULL)
 	
    //Paint the screen black
@@ -64,74 +58,69 @@ void do_gui()
    //sheet_setsheet(sheet_mouse,12,12,100,100);
    // disable_int();
    // init_pci();
-	// pci_dev_t* pcid=get_pci_bga();
-   // vga_screen_width=1024;
-   // vga_screnn_height=768;
-   // init_bga(pcid);
+	//  pci_dev_t* pcid=get_pci_bga();
+   //  init_bga(pcid);
    // enable_int();
    
-
+   #ifdef all_debug
    sheets=sheets_init();
    set_bkcolor(sheets,rgb_Black);
-   
 
    sheet_mouse = sheet_alloc(sheets);
 	sheet_setsheet(sheet_mouse, 12, 12, 100, 100);
 	u32 *sheet_buf4 = (u32 *)K_PHY2LIN(sys_kmalloc(sheet_mouse->width * sheet_mouse->height*4));
 	drawmouse(sheet_buf4);
 	sheet_setbuf(sheet_mouse, sheet_buf4);
-	sheet_set_layer(sheets,sheet_mouse,255);
+	sheet_set_layer(sheets,sheet_mouse,10000);
+   #endif
    
-     
+   #ifdef gui_debug
+   int n=100;
+   while (n--)
+   {
+      putPoint(n+100,100,rgb_Red);
+   }
+   rectangle(0,0,100,100,rgb_Blue);
+   drawline(200,10,130,rgb_White);
+   vga_write_char(100,100,'h',rgb_Red,rgb_Black);
+   vga_write_char(108,100,'e',rgb_Red,rgb_Black);
+   vga_write_char(116,100,'l',rgb_Red,rgb_Black);
+   vga_write_char(124,100,'l',rgb_Red,rgb_Black);
+   vga_write_char(132,100,'o',rgb_Red,rgb_Black);
+   vga_write_char(140,100,',',rgb_Red,rgb_Black);
+   vga_write_string(148,100,"world",rgb_Red,rgb_Black);
+   #endif
+   
+   #ifdef sheet_debug
+   sheets=sheets_init();
+   set_bkcolor(sheets,rgb_Black);
+   sheet_test();
+   #endif
   
-   
-   //sheet_test();
-   //win_test();
-   // win_cmd_put_string(mywin,"dsfdf");
-   
-   
-   // for (int i =0; i < memsize; i++)
-   // {
-   //    *(p++)=0x1;
-   // }
-   //memset((u8*)K_PHY2LIN(0xA0000),Blue,0x1ffff);
-   //cmd_window_write_string(100,100,"hello,os",Red,Blue);
-   //memset((u8*)memstart,Red,320*200);
-   //drawline(20,20,200,Red);
-   //u8* buffer=sys_kmalloc(320*200);
-  // draw_rect(buffer,Black,100,50,100,100);
-   
-  // memcpy((u8 *)memstart, buffer, 320*200);
-   // rectangle(100,20,300,100,Red);
-   // cmd_window_write_char(100,100,(int)'d',Red,Black);
-   // cmd_window_write_string(100,100,"hello123",Red,Blue);
-   //cmd_window_draw_mouse(100, 100, Blue, Black);
-  // while(1)
-   // {
-   // //sheets->need_update=TRUE;
-  
-   // }
+   #ifdef win_debug
+   sheets=sheets_init();
+   set_bkcolor(sheets,rgb_Black);
+   win_test();
+   #endif
+
 }
 
 void putPoint(int x, int y, int Color) /* 画点函数 */
 {
-   u8 *p;
-
-   p = (u8*)memstart;
-   *(x + y * 320 + p) = Color;
+   u32 *p;
+   p = (u32*)vga_video_start;
+   *(u32*)(x + y * 320 + p) = Color;
 }
 
 void drawline(int row, int start, int end, int color)
 // draw a line form x to y
 {
-   char *lstart, *lend;
-   lstart = (char *)(memstart + row * 320 + start);
-   // lend = (char *)(memstart+row*320+end);
+   u32 *lstart, *lend;
+   lstart = (u32 *)(vga_video_start + row * vga_screen_width + start);
 
-   memset((void *)lstart, color, end - start);
+   fastset((void *)lstart, color, end - start);
 }
 void rectangle(int x1, int y1, int x2, int y2, int Color) /* 画一矩形*/
-
 {
    for (int i = x1; i < x2; i++)
    {

@@ -16,13 +16,6 @@
 
 #include "pci.h"
 
-/*
- * Copyright (C) 2020-2022 The opuntiaOS Project Authors.
- *  + Contributed by Nikita Melekhin <nimelehin@gmail.com>
- *
- * Use of this source code is governed by a BSD-style license that can be
- * found in the LICENSE file.
- */
 
 #define DEBUG_PCI
 
@@ -127,11 +120,6 @@ int pci_find_devices() {
                 }
                 dev.type = dev_type_by_class(&dev);
 				pci_devs[count ++] = dev;
-#ifdef DEBUG_PCI
-                kprintf("PCI: Vendor %x, devID %x, cl %x scl %x\n",
-                        dev.vendor_id, dev.device_id, dev.class_id,
-                        dev.subclass_id);
-#endif
             }
         }
     }

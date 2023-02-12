@@ -16,40 +16,41 @@
 #include "sheet.h"
 u32 *sheets_bitmap;
 struct sheets *sheets;
+
+extern struct sheet* mouse_bind_sheet;
+
+static int top_sheet_layer=5000;
 void sheet_test()
 {
-    disable_int();
-
-    /// ////////////////////
     struct sheet *sheet1 = sheet_alloc(sheets);
-    struct sheet *sheet2 = sheet_alloc(sheets);
-    struct sheet *sheet3 = sheet_alloc(sheets);
-
     sheet_setsheet(sheet1, 100, 100, 0, 0);
     u32 *sheet_buf1 = (u32 *)K_PHY2LIN(sys_kmalloc(100 * 100 * 4));
     fastset((void *)sheet_buf1, rgb_Blue, 100 * 100);
-
     sheet_setbuf(sheet1, (u32 *)sheet_buf1);
 
-    // sheet_setsheet(sheet2, 100, 100, 100, 0);
-    // u32 *sheet_buf2 = (u32 *)sys_malloc(sheet2->width * sheet2->height * 4);
-    // fastset(sheet_buf2, rgb_Red, sheet2->width * sheet2->height);
-    // sheet_setbuf(sheet2, sheet_buf2);
+    struct sheet *sheet2 = sheet_alloc(sheets);
+    sheet_setsheet(sheet2, 100, 100, 0, 0);
+    u32 *sheet_buf2 = (u32 *)K_PHY2LIN(sys_kmalloc(100 * 100 * 4));
+    fastset((void *)sheet_buf2, rgb_Light_Green, 100 * 100);
+    sheet_setbuf(sheet2, (u32 *)sheet_buf2);
 
-    // sheet_setsheet(sheet3, 100, 100, 200, 0);
-    // u32 *sheet_buf3 = (u32 *)sys_malloc(sheet3->width * sheet3->height * 4);
-    // fastset(sheet_buf3, rgb_Green, sheet3->width * sheet3->height);
-    // sheet_setbuf(sheet3, sheet_buf3);
+    struct sheet *sheet3 = sheet_alloc(sheets);
+    sheet_setsheet(sheet3, 100, 100, 0, 0);
+    u32 *sheet_buf3 = (u32 *)K_PHY2LIN(sys_kmalloc(100 * 100 * 4));
+    fastset((void *)sheet_buf3, rgb_Light_Red, 100 * 100);
+    sheet_setbuf(sheet3, (u32 *)sheet_buf3);
 
-    sheet_set_layer(sheets, sheet1, 3);
-    // sheet_set_layer(sheets, sheet2, 5);
-    // sheet_set_layer(sheets, sheet3, 8);
+    sheet_set_layer(sheets,sheet1,6);
+    sheet_set_layer(sheets,sheet2,4);
+    sheet_set_layer(sheets,sheet3,5);
 
-    sheet_refresh_rect(sheets);
 
-    //   sheet_slide(sheets,sheet3,150,0);
-    // sheet_slide(sheets,sheet1,200,0);
-    enable_int();
+    sheet_slide(sheets,sheet1,100,100);
+    sheet_slide(sheets,sheet2,10,100);
+    sheet_slide(sheets,sheet3,1,0);
+
+    mouse_bind_sheet=sheet2;
+
 }
 
 void set_bkcolor(struct sheets *sheets, u32 color)
@@ -64,7 +65,6 @@ void set_bkcolor(struct sheets *sheets, u32 color)
 
     fastset((void *)bksheet->buf, color, bksheet->width * bksheet->height);
     sheets->need_update = TRUE;
-    // sheet_refresh_rect(sheets);
     enable_int();
 }
 
@@ -87,7 +87,6 @@ struct sheets *sheets_init()
     sheets->sheet0 = (struct sheetnode *)K_PHY2LIN(sys_kmalloc(sizeof(struct sheetnode)));
     memset((u8 *)sheets->sheet0, 0, sizeof(struct sheetnode));
     sheets->sheet0->nxt = sheets->sheet0->pre = 0;
-    // sheets->buffer=(u32*)sheets_bitmap;
     return sheets;
 }
 
@@ -144,10 +143,10 @@ void sheet_setbuf(struct sheet *sheet, u32 *buf)
 void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
 {
 
-    if (layer >= MAX_SHEETS)
-    {
-        layer = MAX_SHEETS - 1;
-    }
+    // if (layer >= MAX_SHEETS)
+    // {
+    //     layer = MAX_SHEETS - 1;
+    // }
     if (layer < -1)
     {
         layer = -1;
@@ -169,9 +168,10 @@ void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
     struct sheetnode *newnode;
     if (sheet_cur->nxt != NULL)
     {
-        sheet_cur->nxt->pre = sheet_cur->pre;
-        newnode = sheet_cur->nxt;
-        sheet_cur = sheet_cur->nxt->nxt;
+        newnode=sheet_cur->nxt;
+        newnode->pre->nxt=newnode->nxt;
+        newnode->nxt->pre=newnode->pre;
+        newnode->nxt=newnode->pre=NULL;
     }
     else
     {
@@ -180,6 +180,7 @@ void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
     }
 
     newnode->layer = layer;
+    
 
     sheet_cur = sheet_head;
     while (sheet_cur->nxt != NULL && sheet_cur->nxt->layer < layer)
@@ -284,9 +285,14 @@ void sheet_slide(struct sheets *sheets, struct sheet *sheet, int mx, int my)
     {
         sheet->y = 0;
     }
-    if (sheet->isuse)
-    {
-        sheets->need_update = TRUE;
-    }
+
+ 
+    sheets->need_update = (sheet->isuse)?TRUE:FALSE;
+
     return;
+}
+
+void sheet_set_top(struct sheet* sheet)
+{
+    sheet_set_layer(sheets,sheet,top_sheet_layer++);
 }

@@ -20,9 +20,10 @@ extern u8 term_cursor_font[][12];
 //list of windows
 MY_WINDOW * mywin_list_header = NULL;
 MY_WINDOW * mywin_list_end = NULL;
-MY_WINDOW * mywin_list_kbd_input = NULL;
 
+MY_WINDOW *mywin,*mywin2;
 
+extern struct sheet* mouse_bind_sheet;
 
 static void init_window(MY_WINDOW* mywin)
 {
@@ -95,16 +96,13 @@ static void draw_win_rect(MY_WINDOW* mywin)
 
 void win_test()
 {
-	struct sheets* s=sheets;
-	// mywin=alloc_window();
-	// mywin2=alloc_window();
 	
-	// sheet_slide(sheets,mywin2->sheet,100,100);
-
-	// win_cmd_put_string(mywin2,"hello,my gui");
-	// win_cmd_put_string(mywin,"llll");
-
-	 //mouse_bind_sheet=mywin2->sheet;
+	mywin=alloc_window();
+	mywin2=alloc_window();
+	sheet_slide(sheets,mywin2->sheet,100,100);
+	win_cmd_put_string(mywin2,"hello,my gui");
+	win_cmd_put_string(mywin,"llll");
+	mouse_bind_sheet=mywin2->sheet;
 
 }
 
@@ -157,8 +155,21 @@ void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)
 			mywin->cmd_cursor_x-=VGA_CHAR_WIDTH;
 		}
 	}
+	if (ahcar=='\b')
+	{
+		if (mywin->cmd_cursor_x!=0)
+		{
+			mywin->cmd_cursor_x-=VGA_CHAR_WIDTH;
+		}else if (mywin->cmd_cursor_x==0&&mywin->cmd_cursor_y>0)
+		{
+			mywin->cmd_cursor_y-=VGA_CHAR_HEIGHT;
+			mywin->cmd_cursor_x=mywin->sheet->width-VGA_CHAR_WIDTH;
+		}
+	win_sheet_put_char(mywin,mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->cmd_cursor_y,' ',mywin->cmd_font_color,rgb_Blue);
+	}else{
 	win_sheet_put_char(mywin,mywin->cmd_cursor_x,mywin->cmd_rect.ry+mywin->cmd_cursor_y,ahcar,mywin->cmd_font_color,rgb_Blue);
 	mywin->cmd_cursor_x+=VGA_CHAR_WIDTH;
+	}
 	sheets->need_update=TRUE;
 	return;
 }

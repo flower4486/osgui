@@ -4,15 +4,6 @@
 
 
 
-#define memstart K_PHY2LIN(0xA0000)
-#define memsize 64000
-#define screen_width 320
-#define cursor_side 6
-#define screen_height 200
-
-
-
-
 void do_gui();
 void do_set_screen(int width,int height);
 void putPoint(int x, int y, int Color);                    // put a point
