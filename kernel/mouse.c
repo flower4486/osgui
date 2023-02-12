@@ -43,7 +43,6 @@ void mouse_handler(int irq)
 		dy=(dy_sign==0x20)?1:-1;
 		dx=(dx_sign==0x10)?-1:1;
 		
-		
 		if (gui_mode==1)
 		{
 		 sheet_slide(sheets,sheet_mouse,4*dx,3*dy);
@@ -51,7 +50,6 @@ void mouse_handler(int irq)
 		 {
 			sheet_slide(sheets,mouse_bind_sheet,4*dx,3*dy);
 		 }
-		 
 		}
 		
 		mouse_in.count = 0;

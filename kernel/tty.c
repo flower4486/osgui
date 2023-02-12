@@ -14,6 +14,7 @@
 #include "window.h"
 #include "vga.h"
 #include "bga.h"
+#include "gui.h"
 int current_console; // 当前显示在屏幕上的console
 void tty_write(TTY *tty, char *buf, int len);
 int tty_read(TTY *tty, char *buf, int len);
@@ -36,7 +37,6 @@ extern struct sheet* mouse_bind_sheet;
 void in_process(TTY *p_tty, u32 key)
 {
 	int real_line = p_tty->console->orig / SCR_WIDTH;
-	// current_window = 0;
 	if (!(key & FLAG_EXT))
 	{
 		put_key(p_tty, key);
@@ -117,8 +117,10 @@ void task_tty()
 	{
 		init_tty(p_tty);
 	}
-	p_tty = tty_table;
 
+	p_tty = tty_table;
+	
+	do_set_screen(320,200);
 	sys_gui();
 
 	select_console(0);
@@ -261,7 +263,7 @@ static void tty_dev_write(TTY *tty)
 				}
 			}
 		}
-
+		out_char(tty->console,ch);
 		win_cmd_put_char(current_window,ch);
 	}
 }

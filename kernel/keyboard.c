@@ -48,9 +48,6 @@ void kb_handler(int irq){
 
 };
 
-
-
-
 void init_kb(){
 	kb_in.count = 0;
 	kb_in.p_head = kb_in.p_tail = kb_in.buf;
