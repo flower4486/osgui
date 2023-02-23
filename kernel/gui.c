@@ -23,6 +23,7 @@ void do_set_screen(int width,int height)
 {
    gui_mode=1;
    bga_set_resolution(width, height);
+   init_gui();
    return;
 }
 void sys_set_screen(void *uesp)
@@ -31,36 +32,8 @@ void sys_set_screen(void *uesp)
 }
 
 
-void sys_gui()
+void init_gui()
 {
-
- //  open gui mode
-   //vga_write_regs(vga_80x25_text);
-   //memset((void*)K_PHY2LIN(0xa0000),Red,0xffff);
-   //int p;
-   //u8* p=(u8 *)vga_video_start;
-   //if(sheets==NULL)
-	
-   //Paint the screen black
-   //memset(p,Black,memsize);
-  
-   //disable_int();
-     //bga_set_resolution(1024,768);
-  
-   //sheet_refresh_rect(sheets);
-  //sheet_mouse=sheet_alloc(sheets);
-	//u8* sheet_buf4;
-   //u8* sheet_buffer=0;
-   //sheet_buf4=(u8*)sys_malloc(sheet_mouse->width*sheet_mouse->height);
-   //drawmouse(sheet_buffer);
-   //sheet_setbuf(sheet_mouse,sheet_buffer);
-	//sheet_set_layer(sheets,sheet_mouse,200);
-   //sheet_setsheet(sheet_mouse,12,12,100,100);
-   // disable_int();
-   // init_pci();
-	//  pci_dev_t* pcid=get_pci_bga();
-   //  init_bga(pcid);
-   // enable_int();
    
    #ifdef all_debug
    sheets=sheets_init();
@@ -93,7 +66,7 @@ void sys_gui()
    
    #ifdef sheet_debug
    sheets=sheets_init();
-   set_bkcolor(sheets,rgb_Black);
+   //set_bkcolor(sheets,rgb_Black);
    sheet_test();
    #endif
   

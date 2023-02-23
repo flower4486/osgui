@@ -97,18 +97,6 @@ int init_bga(pci_dev_t *dev) {
     
     vga_video_start = pci_read_bar(dev, 0) & 0xfffffff0;
     u32 err_temp;
-    for (int k = 0; k < 1024*768*4; k += num_4K) {
-        err_temp = lin_mapping_phy(
-                       vga_video_start + k, 	    //线性地址					
-					   vga_video_start + k,	    //物理地址
-					   1,		    //进程pid						
-					   PG_P | PG_USU | PG_RWW,  //页目录的属性位			
-					   PG_P | PG_USU | PG_RWW); //页表的属性位			
-		if (err_temp != 0)
-		{
-			disp_color_str("init_page_pte Error:lin_mapping_phy", 0x74);
-			return -1;
-		}
-    }
+
     return 0;
 }

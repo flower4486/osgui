@@ -121,8 +121,7 @@ void task_tty()
 
 	p_tty = tty_table;
 	
-	do_set_screen(320,200);
-	sys_gui();
+
 
 	select_console(0);
 

@@ -46,6 +46,10 @@ int kernel_main()
 	
 	init();//内存管理模块的初始化  add by liang 
 	
+	init_pci();
+	pci_dev_t* pcid=get_pci_bga();
+    init_bga(pcid);
+
 	//initialize PCBs, added by xw, 18/5/26
 	error = initialize_processes();
 	if(error != 0)
@@ -84,9 +88,7 @@ int kernel_main()
 	 * interrupt. added by xw
 	 * 
 	 */
-	init_pci();
-	pci_dev_t* pcid=get_pci_bga();
-    init_bga(pcid);
+
 	enable_int();
 	
     /***********************************************************************

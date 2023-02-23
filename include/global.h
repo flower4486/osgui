@@ -65,7 +65,7 @@ extern u32 vga_screen_line_size, bga_screen_buffer_size;
 extern u32 vga_video_start;
 
 
-//#define all_debug
+#define all_debug
 // #define gui_debug
- //#define sheet_debug
+//#define sheet_debug
  //#define win_debug

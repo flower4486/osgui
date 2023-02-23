@@ -20,6 +20,7 @@ struct sheets *sheets;
 extern struct sheet* mouse_bind_sheet;
 
 static int top_sheet_layer=5000;
+
 void sheet_test()
 {
     struct sheet *sheet1 = sheet_alloc(sheets);
@@ -40,7 +41,7 @@ void sheet_test()
     fastset((void *)sheet_buf3, rgb_Light_Red, 100 * 100);
     sheet_setbuf(sheet3, (u32 *)sheet_buf3);
 
-    sheet_set_layer(sheets,sheet1,6);
+    sheet_set_layer(sheets,sheet1,3);
     sheet_set_layer(sheets,sheet2,4);
     sheet_set_layer(sheets,sheet3,5);
 
@@ -137,6 +138,7 @@ void sheet_setsheet(struct sheet *sheet, int width, int height, int x, int y)
 void sheet_setbuf(struct sheet *sheet, u32 *buf)
 {
     sheet->buf = buf;
+    
     return;
 }
 
