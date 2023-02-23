@@ -9,6 +9,7 @@ USERLIB_OBJS	:= $(patsubst %.asm, $(OBJDIR)/%.o, $(USERLIB_OBJS))
 USER_SRCS :=	user/ptTest.c		\
 		user/shell_0.c		\
 		user/test.c  		 \
+		user/test2.c    \
 
 USER_BINS	:= $(patsubst %.c, $(OBJDIR)/%.bin, $(USER_SRCS))
 USER_BASENAMES	:= $(patsubst $(OBJDIR)/user/%, %, $(USER_BINS))

@@ -246,6 +246,10 @@ void sheet_write_graphic_mem()
             *((u32 *)(sheets_bitmap + i));
     }
 }
+void sys_write_gmem()
+{
+    return;
+}
 
 void sheet_free(struct sheet *sheet, struct sheets *sheets)
 {

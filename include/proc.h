@@ -153,6 +153,8 @@ typedef struct s_proc {
 	
 	//added by zcr
 	struct file_desc * filp[NR_FILES];
+	//process's window
+	void* p_win;
 	//~zcr
 }PROCESS_0;
 

@@ -141,7 +141,16 @@ MY_WINDOW* alloc_window()
 	return mywin;
 }
 
-
+void do_get_win()
+{
+	current_window=alloc_window();
+	sheet_set_top(current_window->sheet);
+	return;
+}
+void sys_get_win()
+{
+	return do_get_win();
+}
 
 void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar)
 {

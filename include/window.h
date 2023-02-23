@@ -42,3 +42,4 @@ void win_cmd_put_char(MY_WINDOW* mywin,u8 ahcar);
 void win_cmd_put_string(MY_WINDOW* mywin,char* s);
 void drawmouse(u32* buf);
 void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u32 color,u32 bkcolor);
+
