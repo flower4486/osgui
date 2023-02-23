@@ -4,7 +4,7 @@
 
 
 
-void do_gui();
+void init_gui();
 void do_set_screen(int width,int height);
 void putPoint(int x, int y, int Color);                    // put a point
 void drawline(int row, int start, int end, int color);     // draw a line

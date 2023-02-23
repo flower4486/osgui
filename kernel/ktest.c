@@ -131,7 +131,7 @@ void initial()
 	
 	
 
-	//exec("orange/shell_0.bin");
+	exec("orange/shell_0.bin");
 	//exec("orange/test.bin");
 	while(1);
 }
