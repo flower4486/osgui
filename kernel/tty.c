@@ -89,8 +89,8 @@ void in_process(TTY *p_tty, u32 key)
 		current_window=(current_window->nxt!=NULL)?current_window->nxt:mywin_list_header;
 		sheet_set_top(current_window->sheet);
 		break;
-		case F3:
-		mouse_bind_sheet=(mouse_bind_sheet==NULL)?current_window->sheet:
+		case F3: 	// 按 F3 将鼠标绑定到当前窗口，此时窗口可随鼠标移动（窗口移动）
+			mouse_bind_sheet=(mouse_bind_sheet==NULL)?current_window->sheet:
 												  NULL;
 		break;
 		case F4:

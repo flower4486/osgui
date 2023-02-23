@@ -69,6 +69,7 @@ void set_bkcolor(struct sheets *sheets, u32 color)
     enable_int();
 }
 
+// 为全局变量sheets分配空间，初始化图层管理系统
 struct sheets *sheets_init()
 {
     struct sheets *sheets;
@@ -91,6 +92,7 @@ struct sheets *sheets_init()
     return sheets;
 }
 
+//  从sheets所管理的图层分配一个新的图层
 struct sheet *sheet_alloc(struct sheets *sheets)
 {
     struct sheet *sheet;
@@ -107,6 +109,7 @@ struct sheet *sheet_alloc(struct sheets *sheets)
     return 0;
 };
 
+// 设置图层的位置和大小
 void sheet_setsheet(struct sheet *sheet, int width, int height, int x, int y)
 {
 
@@ -135,6 +138,8 @@ void sheet_setsheet(struct sheet *sheet, int width, int height, int x, int y)
     return;
 }
 
+
+// 设置图层还没有写到显存中的信息
 void sheet_setbuf(struct sheet *sheet, u32 *buf)
 {
     sheet->buf = buf;
@@ -142,6 +147,7 @@ void sheet_setbuf(struct sheet *sheet, u32 *buf)
     return;
 }
 
+// 设置图层在图层系统中的层数，处理相应链表操作
 void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
 {
 
@@ -214,7 +220,7 @@ void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
     return;
 }
 
-
+// 刷新所有有更新的图层，调用sheet_write_graphic_mem来写显存
 void sheet_refresh_rect(struct sheets *sheets)
 {
     struct sheetnode *sheet_cur = sheets->sheet0->nxt;
@@ -251,6 +257,7 @@ void sys_write_gmem()
     return;
 }
 
+// 预备用来关闭窗口
 void sheet_free(struct sheet *sheet, struct sheets *sheets)
 {
     if (sheet->isuse)
@@ -270,6 +277,7 @@ void sheet_free(struct sheet *sheet, struct sheets *sheets)
     }
 }
 
+// 实现图层移动
 void sheet_slide(struct sheets *sheets, struct sheet *sheet, int mx, int my)
 {
     sheet->x += mx;
