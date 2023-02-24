@@ -43,5 +43,4 @@ void sheet_change_output(struct sheets *sheets);
 void sheet_setbuf(struct sheet* sheet,u32* buf);
 void sheet_slide(struct sheets* sheets,struct sheet* sheet,int mx,int my);
 void set_bkcolor(struct sheets* sheets,u32 color);
-void sheet_write_graphic_mem();
 void sheet_set_top(struct sheet* sheet);

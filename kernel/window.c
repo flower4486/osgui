@@ -251,6 +251,20 @@ void win_sheet_put_char(MY_WINDOW* mywin,int x,int y,int achar,u32 color,u32 bkc
       }
    }
 	sheets->need_update=TRUE;
-
    return;
+}
+void win_title_put_char(MY_WINDOW* mywin,char ch,int cursor)
+{
+	win_sheet_put_char(mywin,cursor,mywin->title_rect.ry,ch,rgb_Black,mywin->title_rect.color);
+
+}
+void win_title_put_string(MY_WINDOW* mywin,char* s)
+{
+	int cursor=0;
+	while (*s!='\0')
+	{
+		win_title_put_char(mywin,*(s++),cursor);
+		cursor+=VGA_CHAR_WIDTH;
+	}
+	return;
 }

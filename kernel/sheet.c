@@ -14,6 +14,8 @@
 #include "color.h"
 #include "window.h"
 #include "sheet.h"
+#include "bga.h"
+
 u32 *sheets_bitmap;
 struct sheets *sheets;
 
@@ -231,27 +233,27 @@ void sheet_refresh_rect(struct sheets *sheets)
             int offset = sheet_cur->sheet->x + sheet_cur->sheet->y * vga_screen_width;
             for (int i = 0; i < sheet_cur->sheet->height; i++)
             {
-                fastcpy((sheets_bitmap + offset), (sheet_cur->sheet->buf + sheet_cur->sheet->width * i), sheet_cur->sheet->width);
+                fastcpy((u32*)bga_ioctl(BGA_GET_BUFFER,!vga_curren_gmem) + offset, (u32*)(sheet_cur->sheet->buf) + sheet_cur->sheet->width * i, sheet_cur->sheet->width);
 
                 offset += vga_screen_width;
             }
 
             sheet_cur = sheet_cur->nxt;
         }
-
-        sheet_write_graphic_mem();
+        vga_curren_gmem=!vga_curren_gmem;
+        //sheet_write_graphic_mem();
         sheets->need_update = FALSE;
     }
 }
 
-void sheet_write_graphic_mem()
-{
-    for (int i = 0; i < vga_screnn_height * vga_screen_width; i++)
-    {
-        *(u32 *)(sheets->videostart + i) =
-            *((u32 *)(sheets_bitmap + i));
-    }
-}
+// void sheet_write_graphic_mem()
+// {
+//     for (int i = 0; i < vga_screnn_height * vga_screen_width; i++)
+//     {
+//         *((u32 *)(sheets->videostart) + i )=
+//             *((u32 *)(sheets_bitmap) + i);
+//     }
+// }
 void sys_write_gmem()
 {
     return;

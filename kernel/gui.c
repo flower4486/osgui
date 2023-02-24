@@ -23,6 +23,11 @@ void do_set_screen(int width,int height)
 {
    gui_mode=1;
    bga_set_resolution(width, height);
+   
+   //fastset((u32*)vga_video_start,rgb_Blue,320*200);
+   //fastset((u32*)vga_video_start+320*200,rgb_Red,320*200);
+  // fastset((u32*)vga_video_start,rgb_White,320*200);
+   //bga_ioctl(BGA_SWAP_BUFFERS,0);
    init_gui();
    return;
 }

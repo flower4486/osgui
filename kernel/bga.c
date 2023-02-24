@@ -18,6 +18,7 @@
 u16 vga_screen_width, vga_screnn_height;
 u32 vga_screen_line_size, bga_screen_buffer_size;
 u32 vga_video_start;
+u8  vga_curren_gmem;
 
 static inline void _bga_write_reg(u16 cmd, u16 data) {
     outw(VBE_DISPI_IOPORT_INDEX, cmd);
@@ -44,6 +45,8 @@ static void _bga_set_resolution(u16 width, u16 height) {
     _bga_write_reg(VBE_DISPI_INDEX_BANK, 0);
     #endif
     vga_screen_line_size = (u32)width * 4;
+    vga_curren_gmem=0;
+
 }
 
 void bga_set_resolution(u32 width, u32 height) 
@@ -52,6 +55,7 @@ void bga_set_resolution(u32 width, u32 height)
     vga_screen_width = width;
     vga_screnn_height = height;
     bga_screen_buffer_size = vga_screen_line_size * height * 2;
+
 }
 
 int bga_ioctl(uintptr_t cmd, uintptr_t arg)

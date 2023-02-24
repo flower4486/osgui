@@ -79,11 +79,12 @@ void in_process(TTY *p_tty, u32 key)
 			}
 			break;
 		case F1:
-			// disable_int();
-			// current_window=alloc_window();
-			// sheet_set_top(current_window->sheet);
-			// win_num++;
-			// enable_int();
+			disable_int();
+			current_window=alloc_window();
+			sheet_set_top(current_window->sheet);
+			win_title_put_string(current_window,"new window");
+			win_num++;
+			enable_int();
 			break;
 		case F2:
 		current_window=(current_window->nxt!=NULL)?current_window->nxt:mywin_list_header;

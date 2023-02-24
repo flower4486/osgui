@@ -63,7 +63,7 @@ extern u32 vga_current_mode;
 extern u16 vga_screen_width, vga_screnn_height;
 extern u32 vga_screen_line_size, bga_screen_buffer_size;
 extern u32 vga_video_start;
-
+extern u8  vga_curren_gmem;
 
 #define all_debug
 // #define gui_debug

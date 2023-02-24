@@ -13,6 +13,6 @@ int main(int arg,char *argv[])
 
 
     set_screen(320,200);
-    get_win();
+    //get_win();
     return 0;
 }
