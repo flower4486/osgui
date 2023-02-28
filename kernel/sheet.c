@@ -16,7 +16,6 @@
 #include "sheet.h"
 #include "bga.h"
 
-u32 *sheets_bitmap;
 struct sheets *sheets;
 
 extern struct sheet* mouse_bind_sheet;
@@ -77,7 +76,6 @@ struct sheets *sheets_init()
     struct sheets *sheets;
     int i;
     sheets = (struct sheets *)K_PHY2LIN(sys_kmalloc(sizeof(struct sheets)));
-    sheets_bitmap = (u32 *)K_PHY2LIN(sys_kmalloc(vga_screen_width * vga_screnn_height * 4));
     if (sheets == 0)
     {
         return NULL;
@@ -226,6 +224,8 @@ void sheet_set_layer(struct sheets *sheets, struct sheet *sheet, int layer)
 void sheet_refresh_rect(struct sheets *sheets)
 {
     struct sheetnode *sheet_cur = sheets->sheet0->nxt;
+    fastset((u32*)bga_ioctl(BGA_GET_BUFFER,!vga_curren_gmem) ,rgb_Black, vga_screen_width*vga_screnn_height);
+
     if (sheets->need_update)
     {
         while (sheet_cur != NULL)
@@ -241,19 +241,12 @@ void sheet_refresh_rect(struct sheets *sheets)
             sheet_cur = sheet_cur->nxt;
         }
         vga_curren_gmem=!vga_curren_gmem;
-        //sheet_write_graphic_mem();
+        bga_ioctl(BGA_SWAP_BUFFERS,vga_curren_gmem);
         sheets->need_update = FALSE;
     }
 }
 
-// void sheet_write_graphic_mem()
-// {
-//     for (int i = 0; i < vga_screnn_height * vga_screen_width; i++)
-//     {
-//         *((u32 *)(sheets->videostart) + i )=
-//             *((u32 *)(sheets_bitmap) + i);
-//     }
-// }
+
 void sys_write_gmem()
 {
     return;

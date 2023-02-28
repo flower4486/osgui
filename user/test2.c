@@ -7,14 +7,25 @@
 #include "proto.h"
 #include "stdio.h"
 
-
-int main(int arg,char *argv[])
+int main(int arg, char *argv[])
 {
-
-
-
-    get_win();
-
+    //set_screen(320,200);
+    int pid=fork();
+    if (pid)
+    {
+		while (1)
+		{
+			printf("1");
+		}
+        //get_win();
+    }
+    else
+    {
+  		while (1)
+		{
+			printf("2");
+		}
+    }
 
     return 0;
 }

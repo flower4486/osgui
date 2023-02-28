@@ -119,7 +119,10 @@ static u32 exec_elfcpy(u32 fd,Elf32_Phdr Echo_Phdr,u32 attribute)  // 这部分�
 	//u32 addr_phy = do_malloc(Echo_Phdr.p_memsz);//申请物理内存					//delete by visual 2016.5.19
 	for(  ; lin_addr<lin_limit ; lin_addr++,file_offset++ )
 	{	
-		lin_mapping_phy(lin_addr,MAX_UNSIGNED_INT,p_proc_current->task.pid,PG_P  | PG_USU | PG_RWW/*说明*/,attribute);//说明：PDE属性尽量为读写，因为它要映射1024个物理页，可能既有数据，又有代码	//edit by visual 2016.5.19
+		lin_mapping_phy(lin_addr,
+						MAX_UNSIGNED_INT,
+						p_proc_current->task.pid,
+						PG_P  | PG_USU | PG_RWW/*说明*/,attribute);//说明：PDE属性尽量为读写，因为它要映射1024个物理页，可能既有数据，又有代码	//edit by visual 2016.5.19
 		if( file_offset<file_limit )
 		{//文件中还有数据，正常拷贝
 			//modified by xw, 18/5/30

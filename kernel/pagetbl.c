@@ -59,7 +59,7 @@ u32 init_page_pte(u32 pid)
 			return -1;
 		}
 	}
-	for (int k = 0; k < 1024*768*4; k += num_4K) {
+	for (int k = 0; k < 1024*768*4*2; k += num_4K) {
         err_temp = lin_mapping_phy(
                        vga_video_start + k, 	    //线性地址					
 					   vga_video_start + k,	    //物理地址
